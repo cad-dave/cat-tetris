@@ -699,137 +699,153 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Mobile control helpers - IMPROVED for better touch handling
-    function handlePressStart(actionFunction) {
+    // ═══════════════════════════════════════════════════════════════════════
+    // 📱 MOBILE CONTROL SYSTEM - COMPLETELY REWRITTEN
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    let activeControlInterval = null;
+    let activeControlTimeout = null;
+    
+    function startContinuousControl(actionFn) {
         if (!started || paused || gameWon) return;
         
-        // Clear any existing intervals first
-        handlePressEnd();
+        // Stop any existing actions
+        stopContinuousControl();
         
-        // Execute action immediately
-        actionFunction();
-
-        // Set up continuous execution after short delay
-        initialTimeout = setTimeout(() => {
-            activeInterval = setInterval(actionFunction, 80); // Slightly faster for better feel
-        }, 120); // Shorter delay for more responsive feel
-    }
-
-    function handlePressEnd() {
-        if (initialTimeout) {
-            clearTimeout(initialTimeout);
-            initialTimeout = null;
-        }
-        if (activeInterval) {
-            clearInterval(activeInterval);
-            activeInterval = null;
-        }
-    }
-
-    function setupContinuousControl(button, actionFunction) {
-        if (!button) return;
-
-        // Touchstart handler
-        button.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handlePressStart(actionFunction);
-        }, { passive: false });
-
-        // Touchend handler
-        button.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handlePressEnd();
-        }, { passive: false });
-
-        // Touchcancel handler (for when touch is interrupted)
-        button.addEventListener('touchcancel', (e) => {
-            e.preventDefault();
-            handlePressEnd();
-        }, { passive: false });
-
-        // Mouse events for desktop
-        button.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            handlePressStart(actionFunction);
-        });
-
-        button.addEventListener('mouseup', (e) => {
-            e.preventDefault();
-            handlePressEnd();
-        });
-
-        button.addEventListener('mouseleave', (e) => {
-            handlePressEnd();
-        });
+        // Execute immediately
+        actionFn();
         
-        // Global blur event to stop all intervals
-        document.addEventListener('blur', handlePressEnd);
+        // Start continuous execution after brief delay
+        activeControlTimeout = setTimeout(() => {
+            activeControlInterval = setInterval(() => {
+                if (!paused && !gameWon && started) {
+                    actionFn();
+                }
+            }, 70); // Faster repeat for smooth movement
+        }, 100); // Shorter initial delay
     }
     
-    function setupTapControl(button, actionFunction) {
+    function stopContinuousControl() {
+        if (activeControlTimeout) {
+            clearTimeout(activeControlTimeout);
+            activeControlTimeout = null;
+        }
+        if (activeControlInterval) {
+            clearInterval(activeControlInterval);
+            activeControlInterval = null;
+        }
+    }
+    
+    // Global cleanup to prevent stuck buttons
+    window.addEventListener('blur', stopContinuousControl);
+    window.addEventListener('visibilitychange', () => {
+        if (document.hidden) stopContinuousControl();
+    });
+    
+    function setupMobileButton(button, action, isContinuous = true) {
         if (!button) return;
         
-        let touchHandled = false;
-        
-        button.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!paused && !gameWon && started) {
-                touchHandled = true;
-                actionFunction();
-            }
-        }, { passive: false });
-        
-        // Prevent click from firing after touchstart
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (touchHandled) {
-                touchHandled = false;
-                return;
-            }
-            if (!paused && !gameWon && started) {
-                actionFunction();
-            }
-        });
-        
-        // Reset flag on touchend
-        button.addEventListener('touchend', () => {
-            setTimeout(() => { touchHandled = false; }, 100);
-        });
+        if (isContinuous) {
+            // For movement buttons (Left, Right, Down)
+            let isTouching = false;
+            
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                isTouching = true;
+                startContinuousControl(action);
+            }, { passive: false, capture: true });
+            
+            button.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                isTouching = false;
+                stopContinuousControl();
+            }, { passive: false, capture: true });
+            
+            button.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                isTouching = false;
+                stopContinuousControl();
+            }, { passive: false, capture: true });
+            
+            // Desktop mouse support
+            button.addEventListener('mousedown', (e) => {
+                if (!isTouching) {
+                    e.preventDefault();
+                    startContinuousControl(action);
+                }
+            });
+            
+            button.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                stopContinuousControl();
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                stopContinuousControl();
+            });
+            
+        } else {
+            // For tap buttons (Rotate, Pause)
+            let lastAction = 0;
+            
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                const now = Date.now();
+                if (now - lastAction > 100) { // Debounce
+                    lastAction = now;
+                    action();
+                }
+            }, { passive: false, capture: true });
+            
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const now = Date.now();
+                if (now - lastAction > 100) {
+                    action();
+                }
+            });
+        }
     }
-
-    // Setup mobile controls
-    setupContinuousControl(btnLeft, () => playerMove(-1));
-    setupContinuousControl(btnRight, () => playerMove(1));
-    setupContinuousControl(btnDown, playerDrop);
-    setupTapControl(btnRotate, () => playerRotate(1));
     
-    // Prevent page scrolling on mobile when touching game area
+    // Setup all controls
+    setupMobileButton(btnLeft, () => playerMove(-1), true);
+    setupMobileButton(btnRight, () => playerMove(1), true);
+    setupMobileButton(btnDown, () => playerDrop(), true);
+    setupMobileButton(btnRotate, () => {
+        if (!paused && !gameWon && started) playerRotate(1);
+    }, false);
+    setupMobileButton(btnPause, () => {
+        if (!gameWon) handlePauseToggle();
+    }, false);
+    
+    // Leaderboard buttons
+    if (btnLeaderboard) {
+        btnLeaderboard.addEventListener('click', showLeaderboard);
+    }
+    if (btnLeaderboardMobile) {
+        setupMobileButton(btnLeaderboardMobile, showLeaderboard, false);
+    }
+    
+    // Prevent page scrolling during gameplay
     const mobileControls = document.getElementById('mobile-controls');
     if (mobileControls) {
         mobileControls.addEventListener('touchmove', (e) => {
             e.preventDefault();
         }, { passive: false });
+        
+        mobileControls.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+        }, { passive: false });
     }
     
-    // Prevent scrolling on game canvas
+    // Prevent canvas scrolling
     if (canvas) {
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
         }, { passive: false });
-    }
-    
-    if (btnPause) {
-        btnPause.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (!gameWon) handlePauseToggle();
-        }, { passive: false });
-        btnPause.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (!gameWon) handlePauseToggle();
-        });
     }
 
     // ═══════════════════════════════════════════════════════════════════════
