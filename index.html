@@ -26,6 +26,34 @@
         </div>
     </div>
 
+    <!-- Name Input Modal -->
+    <div id="nameModal" class="modal">
+        <div class="modal-content name-modal">
+            <div class="modal-header">
+                <h2>🐱 Meow-velous!</h2>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">You reached 6000 points!</p>
+                <div class="time-display-large" id="finalTimeDisplay">0:00.0</div>
+                <div class="name-input-container">
+                    <label for="playerName" class="name-label">What's your cat name?</label>
+                    <input 
+                        type="text" 
+                        id="playerName" 
+                        class="name-input" 
+                        placeholder="Whiskers, Mr. Mittens, Luna..."
+                        maxlength="20"
+                        autocomplete="off"
+                    />
+                    <div class="name-hint">Press Enter or click Purr-fect! to save</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-primary" id="saveName">😸 Purr-fect!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="game-wrapper">
         <button id="startBtn" type="button" class="startBtn">
             Pet Me to Start

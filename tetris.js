@@ -141,10 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('tetrisLeaderboard', JSON.stringify(records));
         },
         
-        add(timeMs) {
+        add(timeMs, playerName) {
             const records = this.load();
             records.push({
                 time: timeMs,
+                name: playerName || 'Anonymous Cat',
                 date: new Date().toISOString()
             });
             records.sort((a, b) => a.time - b.time);
@@ -448,9 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameWon = true;
                 started = false;
                 
-                const finalTime = stopTimer();
-                leaderboard.add(finalTime);
-                updateBestTime();
+                stopTimer(); // Stop the timer
                 
                 if (animationId !== null) {
                     cancelAnimationFrame(animationId);
@@ -503,10 +502,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         ctx.textAlign = 'left';
 
+        // Show name input modal after short delay
         setTimeout(() => {
-            if (startBtn) startBtn.style.display = 'block';
-            showLeaderboard();
-        }, 1000);
+            showNameInputModal();
+        }, 500);
     }
 
     function playerMove(dir) {
@@ -834,6 +833,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ═══════════════════════════════════════════════════════════════════════
+    // 🐱 NAME INPUT MODAL
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    function showNameInputModal() {
+        const modal = document.getElementById('nameModal');
+        const input = document.getElementById('playerName');
+        const finalTimeDisplay = document.getElementById('finalTimeDisplay');
+        
+        if (!modal || !input || !finalTimeDisplay) return;
+        
+        // Display the final time
+        finalTimeDisplay.textContent = leaderboard.formatTime(elapsedTime);
+        
+        // Clear any previous input
+        input.value = '';
+        
+        // Show modal
+        modal.classList.add('show');
+        
+        // Focus input after animation
+        setTimeout(() => {
+            input.focus();
+        }, 300);
+    }
+    
+    function hideNameInputModal() {
+        const modal = document.getElementById('nameModal');
+        if (modal) modal.classList.remove('show');
+    }
+    
+    function savePlayerName() {
+        const input = document.getElementById('playerName');
+        let playerName = input ? input.value.trim() : '';
+        
+        // Use default name if empty
+        if (!playerName) {
+            playerName = 'Anonymous Cat';
+        }
+        
+        // Add to leaderboard with name
+        leaderboard.add(elapsedTime, playerName);
+        updateBestTime();
+        
+        // Hide name modal
+        hideNameInputModal();
+        
+        // Show start button and leaderboard
+        setTimeout(() => {
+            if (startBtn) startBtn.style.display = 'block';
+            showLeaderboard();
+        }, 300);
+    }
+    
+    // Name input modal handlers
+    const saveNameBtn = document.getElementById('saveName');
+    const playerNameInput = document.getElementById('playerName');
+    
+    if (saveNameBtn) {
+        saveNameBtn.addEventListener('click', savePlayerName);
+    }
+    
+    if (playerNameInput) {
+        // Save on Enter key
+        playerNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                savePlayerName();
+            }
+        });
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════
     // 🏆 LEADERBOARD UI
     // ═══════════════════════════════════════════════════════════════════════
     
@@ -852,11 +922,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '';
                 const isRecord = index === 0;
                 const date = new Date(record.date).toLocaleDateString();
+                const playerName = record.name || 'Anonymous Cat';
                 
                 return `
                     <div class="leaderboard-item ${isRecord ? 'record' : ''}">
                         <span class="leaderboard-rank ${rankClass}">#${index + 1}</span>
-                        <div style="flex: 1;">
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${playerName}</div>
                             <div class="leaderboard-time">${leaderboard.formatTime(record.time)}</div>
                             <div class="leaderboard-date">${date}</div>
                         </div>

@@ -306,6 +306,11 @@ body::before {
     animation: slideIn 0.3s ease;
 }
 
+.modal-content.name-modal {
+    border-color: #FFD700;
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+}
+
 @keyframes slideIn {
     from { 
         transform: translateY(-50px);
@@ -326,11 +331,22 @@ body::before {
     align-items: center;
 }
 
+.name-modal .modal-header {
+    background: rgba(255, 215, 0, 0.2);
+    border-bottom-color: #FFD700;
+    justify-content: center;
+}
+
 .modal-header h2 {
     margin: 0;
     color: #0DC2FF;
     font-size: 1.8rem;
     text-shadow: 0 0 10px rgba(13, 194, 255, 0.8);
+}
+
+.name-modal .modal-header h2 {
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
 }
 
 .modal-close {
@@ -365,6 +381,89 @@ body::before {
     font-style: italic;
 }
 
+/* Name Input Modal Styles */
+.time-display-large {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 900;
+    color: #0DC2FF;
+    text-shadow: 0 0 20px rgba(13, 194, 255, 0.8);
+    margin: 20px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.name-input-container {
+    margin: 30px 0;
+}
+
+.name-label {
+    display: block;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #FFD700;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.name-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    border-radius: 8px;
+    color: #fff;
+    text-align: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.name-input:focus {
+    outline: none;
+    border-color: #FFD700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.name-input::placeholder {
+    color: #666;
+    font-style: italic;
+}
+
+.name-hint {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #1a1a1a;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Leaderboard List */
+
 .leaderboard-list {
     margin: 20px 0;
 }
@@ -396,22 +495,36 @@ body::before {
     font-weight: 900;
     color: #0DC2FF;
     width: 50px;
+    flex-shrink: 0;
 }
 
 .leaderboard-rank.gold { color: #FFD700; }
 .leaderboard-rank.silver { color: #C0C0C0; }
 .leaderboard-rank.bronze { color: #CD7F32; }
 
+.leaderboard-info {
+    flex: 1;
+    margin: 0 15px;
+}
+
+.leaderboard-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 3px;
+}
+
 .leaderboard-time {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #fff;
+    color: #0DC2FF;
     font-variant-numeric: tabular-nums;
 }
 
 .leaderboard-date {
     font-size: 0.8rem;
     color: #888;
+    margin-top: 3px;
 }
 
 .leaderboard-empty {
