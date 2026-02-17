@@ -487,15 +487,37 @@ body::before {
     flex-direction: column;
     gap: 5px;
     min-width: 60px;
+    justify-content: center;
+    align-items: center;
 }
 
-.mobile-timer {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #0DC2FF;
+.mobile-score-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    background: rgba(255, 13, 114, 0.2);
+    border: 2px solid rgba(255, 13, 114, 0.5);
+    border-radius: 8px;
+    min-width: 70px;
+}
+
+.mobile-score {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #FF0D72;
     text-align: center;
-    text-shadow: 0 0 10px rgba(13, 194, 255, 0.8);
+    text-shadow: 0 0 10px rgba(255, 13, 114, 0.8);
     font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.mobile-score-label {
+    font-size: 0.7rem;
+    color: #888;
+    text-align: center;
+    margin-top: 2px;
 }
 
 .dpad-container {
@@ -521,8 +543,26 @@ body::before {
     touch-action: manipulation; 
     user-select: none;
     min-width: 60px;
-    transition: all 0.1s;
+    transition: all 0.05s;
     background: rgba(0, 123, 255, 0.8);
+    position: relative;
+}
+
+#mobile-controls button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.05s;
+}
+
+#mobile-controls button:active::after {
+    opacity: 1;
 }
 
 .move-btn {
@@ -534,9 +574,10 @@ body::before {
 }
 
 #mobile-controls button:active {
-    filter: brightness(120%);
-    transform: scale(0.95);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    filter: brightness(130%);
+    transform: scale(0.96);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.8);
 }
 
 @media (max-width: 700px) {

@@ -58,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const startBtn = document.getElementById('startBtn');
     const timerEl = document.getElementById('timer');
-    const mobileTimerEl = document.getElementById('mobileTimer');
     const bestTimeEl = document.getElementById('bestTime');
     const progressBarEl = document.getElementById('progressBar');
 
@@ -356,7 +355,6 @@ document.addEventListener('DOMContentLoaded', () => {
         elapsedTime = Date.now() - gameStartTime;
         const timeStr = leaderboard.formatTime(elapsedTime);
         if (timerEl) timerEl.textContent = timeStr;
-        if (mobileTimerEl) mobileTimerEl.textContent = timeStr;
     }
     
     function updateBestTime() {
@@ -616,10 +614,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const scoreEl = document.getElementById('score');
         const levelEl = document.getElementById('level');
         const linesEl = document.getElementById('lines');
+        const mobileScoreEl = document.getElementById('mobileScore');
 
         if (scoreEl) scoreEl.innerText = player.score;
         if (levelEl) levelEl.innerText = player.level;
         if (linesEl) linesEl.innerText = player.lines;
+        if (mobileScoreEl) mobileScoreEl.innerText = player.score;
         
         // Update progress bar
         if (progressBarEl) {
@@ -700,16 +700,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Mobile control helpers
+    // Mobile control helpers - IMPROVED for better touch handling
     function handlePressStart(actionFunction) {
         if (!started || paused || gameWon) return;
         
+        // Clear any existing intervals first
         handlePressEnd();
+        
+        // Execute action immediately
         actionFunction();
 
+        // Set up continuous execution after short delay
         initialTimeout = setTimeout(() => {
-            activeInterval = setInterval(actionFunction, 100);
-        }, 150);
+            activeInterval = setInterval(actionFunction, 80); // Slightly faster for better feel
+        }, 120); // Shorter delay for more responsive feel
     }
 
     function handlePressEnd() {
@@ -726,31 +730,74 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupContinuousControl(button, actionFunction) {
         if (!button) return;
 
-        ['mousedown', 'touchstart'].forEach(event => {
-            button.addEventListener(event, (e) => {
-                e.preventDefault();
-                handlePressStart(actionFunction);
-            });
+        // Touchstart handler
+        button.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handlePressStart(actionFunction);
+        }, { passive: false });
+
+        // Touchend handler
+        button.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handlePressEnd();
+        }, { passive: false });
+
+        // Touchcancel handler (for when touch is interrupted)
+        button.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            handlePressEnd();
+        }, { passive: false });
+
+        // Mouse events for desktop
+        button.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            handlePressStart(actionFunction);
         });
 
-        ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(event => {
-            button.addEventListener(event, (e) => {
-                handlePressEnd();
-            });
+        button.addEventListener('mouseup', (e) => {
+            e.preventDefault();
+            handlePressEnd();
+        });
+
+        button.addEventListener('mouseleave', (e) => {
+            handlePressEnd();
         });
         
+        // Global blur event to stop all intervals
         document.addEventListener('blur', handlePressEnd);
     }
     
     function setupTapControl(button, actionFunction) {
         if (!button) return;
+        
+        let touchHandled = false;
+        
         button.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (!paused && !gameWon) actionFunction();
-        });
+            e.stopPropagation();
+            if (!paused && !gameWon && started) {
+                touchHandled = true;
+                actionFunction();
+            }
+        }, { passive: false });
+        
+        // Prevent click from firing after touchstart
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            if (!paused && !gameWon) actionFunction();
+            if (touchHandled) {
+                touchHandled = false;
+                return;
+            }
+            if (!paused && !gameWon && started) {
+                actionFunction();
+            }
+        });
+        
+        // Reset flag on touchend
+        button.addEventListener('touchend', () => {
+            setTimeout(() => { touchHandled = false; }, 100);
         });
     }
 
@@ -760,11 +807,26 @@ document.addEventListener('DOMContentLoaded', () => {
     setupContinuousControl(btnDown, playerDrop);
     setupTapControl(btnRotate, () => playerRotate(1));
     
+    // Prevent page scrolling on mobile when touching game area
+    const mobileControls = document.getElementById('mobile-controls');
+    if (mobileControls) {
+        mobileControls.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    }
+    
+    // Prevent scrolling on game canvas
+    if (canvas) {
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    }
+    
     if (btnPause) {
         btnPause.addEventListener('touchstart', (e) => {
             e.preventDefault();
             if (!gameWon) handlePauseToggle();
-        });
+        }, { passive: false });
         btnPause.addEventListener('click', (e) => {
             e.preventDefault();
             if (!gameWon) handlePauseToggle();
