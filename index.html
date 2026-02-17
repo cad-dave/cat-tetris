@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Meow-tris 🐱 Speed Run Challenge</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏆 Speed Run Records</h2>
+                <button class="modal-close" id="closeLeaderboard">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Race to 6000 points - Fastest times win!</p>
+                <div id="leaderboardList" class="leaderboard-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="clearLeaderboard">Clear Records</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-wrapper">
+        <button id="startBtn" type="button" class="startBtn">
+            Pet Me to Start
+        </button>
+
+        <main class="container">
+            <aside class="sidebar left">
+                <div class="scorebox">
+                    <h3>Next</h3>
+                    <canvas id="next" width="120" height="120" aria-label="Next Tetris Piece"></canvas>
+                </div>
+                <div class="scorebox">
+                    <h3>⏱️ Time</h3>
+                    <div class="timer-display" id="timer">0:00.0</div>
+                    <div class="record-display">
+                        <span class="record-label">Best:</span>
+                        <span id="bestTime">--:--.-</span>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="game-area">
+                <canvas id="tetris" width="200" height="400" aria-label="Tetris Game Board" role="application"></canvas>
+                <canvas id="effects" width="200" height="400" aria-label="Visual Effects Layer"></canvas>
+            </div>
+
+            <aside class="sidebar right">
+                <div class="scorebox" id="stats">
+                    <h3>🎯 Progress</h3>
+                    <div class="score-large" id="score">0</div>
+                    <div class="score-target">/ 6000</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar"></div>
+                    </div>
+                    <div class="stat-row"><strong>Level:</strong> <span id="level">1</span></div>
+                    <div class="stat-row"><strong>Lines:</strong> <span id="lines">0</span></div>
+                </div>
+                <div class="scorebox">
+                    <button class="btn-leaderboard" id="viewLeaderboard">
+                        🏆 View Records
+                    </button>
+                </div>
+                <div class="scorebox controls-info">
+                    <h3>Controls</h3>
+                    <div>Move: ← / →</div>
+                    <div>Drop: ↓</div>
+                    <div>Rotate: Q / W</div>
+                    <div>Pause: SPACE</div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <div id="mobile-controls">
+        <div class="left-group">
+            <button id="btn-pause" class="action-btn">⏸</button>
+            <button id="btn-leaderboard-mobile" class="action-btn">🏆</button>
+        </div>
+        
+        <div class="dpad-container">
+            <button id="btn-left" class="move-btn">◀</button>
+            <div class="center-controls">
+                <button id="btn-rotate" class="action-btn">⟳</button>
+                <button id="btn-down" class="move-btn">▼</button>
+            </div>
+            <button id="btn-right" class="move-btn">▶</button>
+        </div>
+
+        <div class="right-group">
+            <div class="mobile-timer" id="mobileTimer">0:00.0</div>
+        </div>
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="gameMusic" loop preload="auto">
+        <source src="Music.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="clearSound" preload="auto">
+        <source src="clear.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="roarSound" preload="auto">
+        <source src="roar.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Your main game script -->
+    <script type="module" src="tetris.js"></script>
+</body>
+</html>
