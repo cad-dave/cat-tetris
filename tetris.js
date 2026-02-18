@@ -66,14 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearSound = document.getElementById('clearSound');
     const roarSound = document.getElementById('roarSound');
     
-    // Mobile controls
     const btnLeft = document.getElementById('btn-left');
     const btnRight = document.getElementById('btn-right');
     const btnDown = document.getElementById('btn-down');
     const btnRotate = document.getElementById('btn-rotate');
-    const btnPause = document.getElementById('btn-pause');
     const btnLeaderboard = document.getElementById('viewLeaderboard');
-    const btnLeaderboardMobile = document.getElementById('btn-leaderboard-mobile');
 
     // ═══════════════════════════════════════════════════════════════════════
     // 🔊 IMPROVED AUDIO MANAGEMENT (Fixes audio interruption bugs)
@@ -613,17 +610,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const scoreEl = document.getElementById('score');
         const levelEl = document.getElementById('level');
         const linesEl = document.getElementById('lines');
-        const mobileScoreEl = document.getElementById('mobileScore');
+        const scoreMobileEl = document.getElementById('scoreMobile');
+        const levelMobileEl = document.getElementById('levelMobile');
+        const progressBarMobileEl = document.getElementById('progressBarMobile');
 
         if (scoreEl) scoreEl.innerText = player.score;
         if (levelEl) levelEl.innerText = player.level;
         if (linesEl) linesEl.innerText = player.lines;
-        if (mobileScoreEl) mobileScoreEl.innerText = player.score;
+        if (scoreMobileEl) scoreMobileEl.innerText = player.score;
+        if (levelMobileEl) levelMobileEl.innerText = player.level;
         
-        // Update progress bar
+        // Update progress bars
         if (progressBarEl) {
             const progress = (player.score / CONFIG.WIN_SCORE) * 100;
             progressBarEl.style.width = `${Math.min(progress, 100)}%`;
+        }
+        if (progressBarMobileEl) {
+            const progress = (player.score / CONFIG.WIN_SCORE) * 100;
+            progressBarMobileEl.style.width = `${Math.min(progress, 100)}%`;
         }
     }
 
@@ -637,12 +641,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (paused) {
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillStyle = 'rgba(0,0,0,0.75)';
             ctx.fillRect(0, 0, canvas.width / 20, canvas.height / 20);
-            ctx.fillStyle = '#0DC2FF';
-            ctx.font = 'bold 1px Arial, sans-serif';
+            ctx.fillStyle = '#FFD700';
+            ctx.font = 'bold 1.4px Arial, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('Taking a Cat Nap', 5, 10);
+            ctx.fillText('😺 Pawsed', 5, 9);
+            ctx.fillStyle = '#0DC2FF';
+            ctx.font = '0.75px Arial, sans-serif';
+            ctx.fillText('Taking a cat nap...', 5, 11);
             ctx.textAlign = 'left';
             animationId = requestAnimationFrame(update);
             return;
@@ -817,16 +824,18 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMobileButton(btnRotate, () => {
         if (!paused && !gameWon && started) playerRotate(1);
     }, false);
-    setupMobileButton(btnPause, () => {
-        if (!gameWon) handlePauseToggle();
-    }, false);
+
+    // Tap the game canvas (or effects overlay) to pause/unpause on mobile
+    const pauseOnTap = (e) => {
+        e.preventDefault();
+        if (started && !gameWon) handlePauseToggle();
+    };
+    if (canvas) canvas.addEventListener('touchstart', pauseOnTap, { passive: false });
+    if (effectsCanvas) effectsCanvas.addEventListener('touchstart', pauseOnTap, { passive: false });
     
-    // Leaderboard buttons
+    // Leaderboard button
     if (btnLeaderboard) {
         btnLeaderboard.addEventListener('click', showLeaderboard);
-    }
-    if (btnLeaderboardMobile) {
-        setupMobileButton(btnLeaderboardMobile, showLeaderboard, false);
     }
     
     // Prevent page scrolling during gameplay
@@ -964,10 +973,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Leaderboard button handlers
     if (btnLeaderboard) {
         btnLeaderboard.addEventListener('click', showLeaderboard);
-    }
-    
-    if (btnLeaderboardMobile) {
-        btnLeaderboardMobile.addEventListener('click', showLeaderboard);
     }
     
     const closeLeaderboard = document.getElementById('closeLeaderboard');

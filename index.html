@@ -45,6 +45,16 @@
                         <span id="bestTime">--:--.-</span>
                     </div>
                 </div>
+                <!-- Mobile-only score panel (right sidebar is hidden on small screens) -->
+                <div class="scorebox mobile-score-panel">
+                    <h3>🎯 Score</h3>
+                    <div class="score-large" id="scoreMobile">0</div>
+                    <div class="score-target">/ 6000</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBarMobile"></div>
+                    </div>
+                    <div class="stat-row"><strong>Level:</strong> <span id="levelMobile">1</span></div>
+                </div>
             </aside>
 
             <div class="game-area">
@@ -80,23 +90,12 @@
     </div>
 
     <div id="mobile-controls">
-        <div class="left-group">
-            <button id="btn-pause" class="action-btn">⏸</button>
-            <button id="btn-leaderboard-mobile" class="action-btn">🏆</button>
+        <button id="btn-left" class="move-btn">◀</button>
+        <div class="center-controls">
+            <button id="btn-rotate" class="action-btn">⟳</button>
+            <button id="btn-down" class="move-btn">▼</button>
         </div>
-        
-        <div class="dpad-container">
-            <button id="btn-left" class="move-btn">◀</button>
-            <div class="center-controls">
-                <button id="btn-rotate" class="action-btn">⟳</button>
-                <button id="btn-down" class="move-btn">▼</button>
-            </div>
-            <button id="btn-right" class="move-btn">▶</button>
-        </div>
-
-        <div class="right-group">
-            <div class="mobile-timer" id="mobileTimer">0:00.0</div>
-        </div>
+        <button id="btn-right" class="move-btn">▶</button>
     </div>
 
     <!-- Audio elements -->
