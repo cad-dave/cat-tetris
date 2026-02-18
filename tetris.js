@@ -380,9 +380,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function updateBestTime() {
-        const best = await leaderboard.getBest();
-        if (bestTimeEl) {
-            bestTimeEl.textContent = best ? leaderboard.formatTime(best) : '--:--.-';
+        try {
+            const { getDocs, query, orderBy, limit } = window.firebaseLeaderboard;
+            const q = query(window.firebaseLeaderboard.collection, orderBy('time_ms', 'asc'), limit(1));
+            const snap = await getDocs(q);
+
+            const holderEl = document.getElementById('recordHolder');
+            const holderNameEl = document.getElementById('recordHolderName');
+
+            if (!snap.empty) {
+                const best = snap.docs[0].data();
+                if (bestTimeEl) bestTimeEl.textContent = leaderboard.formatTime(best.time_ms);
+                if (holderEl && holderNameEl) {
+                    holderNameEl.textContent = best.name || 'Anonymous Cat';
+                    holderEl.style.display = 'block';
+                }
+            } else {
+                if (bestTimeEl) bestTimeEl.textContent = '--:--.-';
+                if (holderEl) holderEl.style.display = 'none';
+            }
+        } catch (e) {
+            // Fallback to localStorage
+            const records = JSON.parse(localStorage.getItem('tetrisLeaderboard') || '[]');
+            const holderEl = document.getElementById('recordHolder');
+            const holderNameEl = document.getElementById('recordHolderName');
+            if (records.length > 0) {
+                if (bestTimeEl) bestTimeEl.textContent = leaderboard.formatTime(records[0].time_ms || records[0].time);
+                if (holderEl && holderNameEl) {
+                    holderNameEl.textContent = records[0].name || 'Anonymous Cat';
+                    holderEl.style.display = 'block';
+                }
+            } else {
+                if (bestTimeEl) bestTimeEl.textContent = '--:--.-';
+                if (holderEl) holderEl.style.display = 'none';
+            }
         }
     }
 
