@@ -128,38 +128,62 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🏆 LEADERBOARD SYSTEM
     // ═══════════════════════════════════════════════════════════════════════
     
+    // ═══════════════════════════════════════════════════════════════════════
+    // 🔥 FIREBASE HELPERS — imported via window.firebaseLeaderboard
+    // ═══════════════════════════════════════════════════════════════════════
+
     const leaderboard = {
-        load() {
-            const data = localStorage.getItem('tetrisLeaderboard');
-            return data ? JSON.parse(data) : [];
+        async add(timeMs, playerName) {
+            try {
+                const { addDoc, collection } = window.firebaseLeaderboard;
+                await addDoc(collection, {
+                    name: playerName || 'Anonymous Cat',
+                    time_ms: timeMs
+                });
+            } catch (e) {
+                console.warn('Firebase write failed, falling back to localStorage', e);
+                // Graceful fallback
+                const records = JSON.parse(localStorage.getItem('tetrisLeaderboard') || '[]');
+                records.push({ name: playerName || 'Anonymous Cat', time_ms: timeMs });
+                records.sort((a, b) => a.time_ms - b.time_ms);
+                records.splice(10);
+                localStorage.setItem('tetrisLeaderboard', JSON.stringify(records));
+            }
         },
-        
-        save(records) {
-            localStorage.setItem('tetrisLeaderboard', JSON.stringify(records));
+
+        async loadTop10() {
+            try {
+                const { getDocs, query, orderBy, limit, collection, db } = window.firebaseLeaderboard;
+                const q = query(collection, orderBy('time_ms', 'asc'), limit(10));
+                const snap = await getDocs(q);
+                return snap.docs.map(d => d.data());
+            } catch (e) {
+                console.warn('Firebase read failed, using localStorage', e);
+                return JSON.parse(localStorage.getItem('tetrisLeaderboard') || '[]')
+                    .map(r => ({ name: r.name, time_ms: r.time_ms || r.time }));
+            }
         },
-        
-        add(timeMs, playerName) {
-            const records = this.load();
-            records.push({
-                time: timeMs,
-                name: playerName || 'Anonymous Cat',
-                date: new Date().toISOString()
-            });
-            records.sort((a, b) => a.time - b.time);
-            records.splice(10); // Keep only top 10
-            this.save(records);
-            return records;
+
+        async getBest() {
+            try {
+                const { getDocs, query, orderBy, limit } = window.firebaseLeaderboard;
+                const q = query(window.firebaseLeaderboard.collection, orderBy('time_ms', 'asc'), limit(1));
+                const snap = await getDocs(q);
+                if (snap.empty) return null;
+                return snap.docs[0].data().time_ms;
+            } catch (e) {
+                console.warn('Firebase getBest failed', e);
+                const records = JSON.parse(localStorage.getItem('tetrisLeaderboard') || '[]');
+                return records.length > 0 ? (records[0].time_ms || records[0].time) : null;
+            }
         },
-        
-        getBest() {
-            const records = this.load();
-            return records.length > 0 ? records[0].time : null;
-        },
-        
-        clear() {
+
+        async clear() {
+            // Note: Firestore records can only be cleared from the Firebase Console.
+            // We clear localStorage fallback here.
             localStorage.removeItem('tetrisLeaderboard');
         },
-        
+
         formatTime(ms) {
             const totalSeconds = Math.floor(ms / 1000);
             const minutes = Math.floor(totalSeconds / 60);
@@ -355,8 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timerEl) timerEl.textContent = timeStr;
     }
     
-    function updateBestTime() {
-        const best = leaderboard.getBest();
+    async function updateBestTime() {
+        const best = await leaderboard.getBest();
         if (bestTimeEl) {
             bestTimeEl.textContent = best ? leaderboard.formatTime(best) : '--:--.-';
         }
@@ -896,23 +920,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) modal.classList.remove('show');
     }
     
-    function savePlayerName() {
+    async function savePlayerName() {
         const input = document.getElementById('playerName');
         let playerName = input ? input.value.trim() : '';
         
-        // Use default name if empty
         if (!playerName) {
             playerName = 'Anonymous Cat';
         }
         
-        // Add to leaderboard with name
-        leaderboard.add(elapsedTime, playerName);
-        updateBestTime();
+        // Show saving indicator
+        const saveBtn = document.getElementById('saveName');
+        if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
+
+        await leaderboard.add(elapsedTime, playerName);
+        await updateBestTime();
         
-        // Hide name modal
+        if (saveBtn) { saveBtn.textContent = '🐾 Save Score'; saveBtn.disabled = false; }
+
         hideNameInputModal();
         
-        // Show start button and leaderboard
         setTimeout(() => {
             if (startBtn) startBtn.style.display = 'block';
             showLeaderboard();
@@ -940,13 +966,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🏆 LEADERBOARD UI
     // ═══════════════════════════════════════════════════════════════════════
     
-    function showLeaderboard() {
+    async function showLeaderboard() {
         const modal = document.getElementById('leaderboardModal');
         const list = document.getElementById('leaderboardList');
         
         if (!modal || !list) return;
         
-        const records = leaderboard.load();
+        modal.classList.add('show');
+        list.innerHTML = '<div class="leaderboard-empty">Loading records... 🐱</div>';
+
+        const records = await leaderboard.loadTop10();
         
         if (records.length === 0) {
             list.innerHTML = '<div class="leaderboard-empty">No records yet!<br>Be the first to set a time!</div>';
@@ -954,7 +983,6 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = records.map((record, index) => {
                 const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '';
                 const isRecord = index === 0;
-                const date = new Date(record.date).toLocaleDateString();
                 const playerName = record.name || 'Anonymous Cat';
                 
                 return `
@@ -962,15 +990,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="leaderboard-rank ${rankClass}">#${index + 1}</span>
                         <div class="leaderboard-info">
                             <div class="leaderboard-name">${playerName}</div>
-                            <div class="leaderboard-time">${leaderboard.formatTime(record.time)}</div>
-                            <div class="leaderboard-date">${date}</div>
+                            <div class="leaderboard-time">${leaderboard.formatTime(record.time_ms)}</div>
                         </div>
                     </div>
                 `;
             }).join('');
         }
-        
-        modal.classList.add('show');
     }
     
     function hideLeaderboard() {
@@ -991,11 +1016,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearLeaderboardBtn = document.getElementById('clearLeaderboard');
     if (clearLeaderboardBtn) {
         clearLeaderboardBtn.addEventListener('click', () => {
-            if (confirm('Clear all records? This cannot be undone!')) {
-                leaderboard.clear();
-                updateBestTime();
-                hideLeaderboard();
-            }
+            alert('To clear global records, please delete them from the Firebase Console.\n\nhttps://console.firebase.google.com');
         });
     }
     

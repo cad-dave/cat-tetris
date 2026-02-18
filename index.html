@@ -114,6 +114,47 @@
         <source src="roar.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- ═══════════════════════════════════════════════════════════════
+         🔥 FIREBASE SETUP
+         Replace the YOUR_* values below with your Firebase project config.
+         Find them at: Firebase Console → Project Settings → Your apps → Web
+         ═══════════════════════════════════════════════════════════════ -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            query,
+            orderBy,
+            limit,
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey:            "AIzaSyDn65M2YeDjSw3sSRKQfCsTLwY_pjMUFLI",
+            authDomain:        "feb17tetris.firebaseapp.com",
+            projectId:         "feb17tetris",
+            storageBucket:     "feb17tetris.firebasestorage.app",
+            messagingSenderId: "426189788647",
+            appId:             "1:426189788647:web:ba67a994aef918f77f5942"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db  = getFirestore(app);
+
+        // Expose everything tetris.js needs via a single global object
+        window.firebaseLeaderboard = {
+            db,
+            collection: collection(db, "leaderboard"),
+            addDoc,
+            getDocs,
+            query,
+            orderBy,
+            limit
+        };
+    </script>
+
     <!-- Your main game script -->
     <script type="module" src="tetris.js"></script>
 </body>
