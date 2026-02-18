@@ -17,11 +17,36 @@
             <div class="modal-body">
                 <p class="modal-subtitle">Race to 6000 points - Fastest times win!</p>
                 <div id="leaderboardList" class="leaderboard-list">
-                    <!-- Will be populated by JavaScript -->
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" id="clearLeaderboard">Clear Records</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Name Input Modal (shown when player wins) -->
+    <div id="nameModal" class="modal">
+        <div class="modal-content name-modal">
+            <div class="modal-header">
+                <h2>🎉 MEOW Win!</h2>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">You reached 6000 points!</p>
+                <div class="time-display-large" id="finalTimeDisplay">0:00.0</div>
+                <div class="name-input-container">
+                    <label class="name-label" for="playerName">Enter your name for the leaderboard:</label>
+                    <input 
+                        type="text" 
+                        id="playerName" 
+                        class="name-input" 
+                        placeholder="Your name..." 
+                        maxlength="32"
+                        autocomplete="off"
+                    >
+                    <p class="name-hint">Leave blank to save as "Anonymous Cat"</p>
+                </div>
+                <button class="btn-primary" id="saveName">🐾 Save Score</button>
             </div>
         </div>
     </div>
