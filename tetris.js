@@ -825,24 +825,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!paused && !gameWon && started) playerRotate(1);
     }, false);
 
-    // Tap the game canvas (or effects overlay) to pause/unpause on mobile
-    const pauseOnTap = (e) => {
-        e.preventDefault();
-        if (started && !gameWon) handlePauseToggle();
-    };
-    if (canvas) canvas.addEventListener('touchstart', pauseOnTap, { passive: false });
-    if (effectsCanvas) effectsCanvas.addEventListener('touchstart', pauseOnTap, { passive: false });
-
     // PAWS button (mobile, below the canvas)
     const btnPaws = document.getElementById('btn-paws');
     if (btnPaws) {
-        btnPaws.addEventListener('touchstart', (e) => {
+        let pawsLastTap = 0;
+        const doPause = (e) => {
             e.preventDefault();
+            e.stopPropagation();
+            const now = Date.now();
+            if (now - pawsLastTap < 200) return; // debounce
+            pawsLastTap = now;
             if (!gameWon) handlePauseToggle();
-        }, { passive: false });
-        btnPaws.addEventListener('click', () => {
-            if (!gameWon) handlePauseToggle();
-        });
+        };
+        btnPaws.addEventListener('touchstart', doPause, { passive: false });
+        btnPaws.addEventListener('click', doPause);
     }
     
     // Leaderboard button

@@ -102,7 +102,15 @@ body::before {
 
 .game-area {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.canvas-wrapper {
+    position: relative;
     display: inline-block;
+    line-height: 0;
 }
 
 #tetris, #effects {
@@ -666,28 +674,29 @@ body::before {
 @media (max-width: 700px) {
     .btn-paws {
         display: block;
-        width: 100%;
-        margin-top: 8px;
-        padding: 10px 0;
-        background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.15));
-        border: 2px solid rgba(255, 215, 0, 0.6);
+        width: 212px; /* matches canvas width + border */
+        margin-top: 10px;
+        padding: 14px 0;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+        border: 2px solid rgba(255, 215, 0, 0.7);
         border-radius: 10px;
         color: #FFD700;
-        font-size: 1.1rem;
-        font-weight: 800;
-        letter-spacing: 2px;
+        font-size: 1.4rem;
+        font-weight: 900;
+        letter-spacing: 3px;
         cursor: pointer;
-        touch-action: none;
+        touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
-        text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
-        transition: all 0.15s ease;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        transition: all 0.1s ease;
+        user-select: none;
     }
 
     .btn-paws:active {
-        background: linear-gradient(135deg, rgba(255, 215, 0, 0.35), rgba(255, 140, 0, 0.35));
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 140, 0, 0.4));
         border-color: #FFD700;
         transform: scale(0.97);
-        box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
     }
 }
 
