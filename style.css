@@ -658,6 +658,39 @@ body::before {
     border-color: rgba(255, 255, 255, 0.9);
 }
 
+/* PAWS button - mobile only, sits below the game canvas */
+.btn-paws {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .btn-paws {
+        display: block;
+        width: 100%;
+        margin-top: 8px;
+        padding: 10px 0;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.15));
+        border: 2px solid rgba(255, 215, 0, 0.6);
+        border-radius: 10px;
+        color: #FFD700;
+        font-size: 1.1rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        cursor: pointer;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+        transition: all 0.15s ease;
+    }
+
+    .btn-paws:active {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.35), rgba(255, 140, 0, 0.35));
+        border-color: #FFD700;
+        transform: scale(0.97);
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
+}
+
 /* Mobile-only score panel in left sidebar */
 .mobile-score-panel {
     display: none;

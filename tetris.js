@@ -832,6 +832,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     if (canvas) canvas.addEventListener('touchstart', pauseOnTap, { passive: false });
     if (effectsCanvas) effectsCanvas.addEventListener('touchstart', pauseOnTap, { passive: false });
+
+    // PAWS button (mobile, below the canvas)
+    const btnPaws = document.getElementById('btn-paws');
+    if (btnPaws) {
+        btnPaws.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameWon) handlePauseToggle();
+        }, { passive: false });
+        btnPaws.addEventListener('click', () => {
+            if (!gameWon) handlePauseToggle();
+        });
+    }
     
     // Leaderboard button
     if (btnLeaderboard) {
