@@ -9,14 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 📊 SCORING SYSTEM
         POINTS: {
-            SINGLE: 50,    // 1 line cleared
-            DOUBLE: 100,   // 2 lines cleared
+            SINGLE: 100,    // 1 line cleared
+            DOUBLE: 200,   // 2 lines cleared
             TRIPLE: 500,   // 3 lines cleared
             TETRIS: 1500   // 4 lines cleared (Tetris!)
         },
         
         // 📈 LEVEL PROGRESSION
-        LINES_PER_LEVEL: 10,  // Lines needed to level up (was 4, now 10)
+        LINES_PER_LEVEL: 8,  // Lines needed to level up (was 4, now 10)
         
         // ⚡ SCORE MULTIPLIER PER LEVEL
         // Formula: points × (1 + (level - 1) × LEVEL_MULTIPLIER)
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         //   Level 2: ×1.2  
         //   Level 3: ×1.4
         //   Level 4: ×1.6
-        LEVEL_MULTIPLIER: 0.2,  // Increase for faster scoring, decrease for slower
+        LEVEL_MULTIPLIER: 0.3,  // Increase for faster scoring, decrease for slower
         
         // ⏱️ GAME SPEED
         BASE_DROP_INTERVAL: 1000,  // Milliseconds between automatic drops at level 1
