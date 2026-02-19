@@ -18,9 +18,6 @@
                 <p class="modal-subtitle">Race to 4500 points - Fastest times win!</p>
                 <div id="leaderboardList" class="leaderboard-list">
                 </div>
-                <div class="modal-actions">
-                    <button class="btn-secondary" id="clearLeaderboard">Clear Records</button>
-                </div>
             </div>
         </div>
     </div>
@@ -35,7 +32,7 @@
                 <p class="modal-subtitle">You reached 4500 points!</p>
                 <div class="time-display-large" id="finalTimeDisplay">0:00.0</div>
                 <div class="name-input-container">
-                    <label class="name-label" for="playerName">Enter your name for the leaderboard:</label>
+                    <label class="name-label" for="playerName">Enter your name:</label>
                     <input 
                         type="text" 
                         id="playerName" 
@@ -43,10 +40,11 @@
                         placeholder="Your name..." 
                         maxlength="32"
                         autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="words"
                     >
-                    <p class="name-hint">Leave blank to save as "Anonymous Cat"</p>
                 </div>
-                <button class="btn-primary" id="saveName">🐾 Save Score</button>
+                <button class="btn-primary btn-save-big" id="saveName">🐾 SAVE MY SCORE!</button>
             </div>
         </div>
     </div>

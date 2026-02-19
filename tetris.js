@@ -961,7 +961,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) modal.classList.remove('show');
     }
     
+    let isSavingScore = false;
+
     async function savePlayerName() {
+        if (isSavingScore) return; // prevent double submit
+        isSavingScore = true;
+
         const input = document.getElementById('playerName');
         let playerName = input ? input.value.trim() : '';
         
@@ -969,16 +974,19 @@ document.addEventListener('DOMContentLoaded', () => {
             playerName = 'Anonymous Cat';
         }
         
-        // Show saving indicator
+        // Disable button immediately
         const saveBtn = document.getElementById('saveName');
-        if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
+        if (saveBtn) { 
+            saveBtn.textContent = '⏳ Saving...'; 
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.7';
+        }
 
         await leaderboard.add(elapsedTime, playerName);
         await updateBestTime();
         
-        if (saveBtn) { saveBtn.textContent = '🐾 Save Score'; saveBtn.disabled = false; }
-
         hideNameInputModal();
+        isSavingScore = false;
         
         setTimeout(() => {
             if (startBtn) startBtn.style.display = 'block';
@@ -1049,13 +1057,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeLeaderboard.addEventListener('click', hideLeaderboard);
     }
     
-    const clearLeaderboardBtn = document.getElementById('clearLeaderboard');
-    if (clearLeaderboardBtn) {
-        clearLeaderboardBtn.addEventListener('click', () => {
-            alert('To clear global records, please delete them from the Firebase Console.\n\nhttps://console.firebase.google.com');
-        });
-    }
-    
     // Close modal when clicking outside
     const modal = document.getElementById('leaderboardModal');
     if (modal) {
@@ -1082,6 +1083,7 @@ document.addEventListener('DOMContentLoaded', () => {
             paused = false;
             started = true;
             gameWon = false;
+            isSavingScore = false;
             effects.particles = [];
             
             // Prime audio elements for mobile playback
