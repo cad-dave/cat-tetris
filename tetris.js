@@ -530,7 +530,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rowCount === 4) {
                 effects.screenShake();
                 effects.flashScreen();
-            }
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100, 50, 200]);
+                }
             
             updateScore();
         }
