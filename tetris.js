@@ -533,6 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (navigator.vibrate) {
                     navigator.vibrate([100, 50, 100, 50, 200]);
                 }
+            }
             
             updateScore();
         }
@@ -733,12 +734,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // ═══════════════════════════════════════════════════════════════════════
     
     document.addEventListener('keydown', e => {
+        const input = document.getElementById('playerName');
+        const inputFocused = input && document.activeElement === input;
+        
         const tetrisKeys = ['ArrowLeft', 'ArrowRight', 'ArrowDown', 'KeyQ', 'KeyW', 'Space', 'KeyP'];
-        if (tetrisKeys.includes(e.code)) {
+        if (tetrisKeys.includes(e.code) && !inputFocused) {
             e.preventDefault();
         }
 
-        if (!started || gameWon) return;
+        if (!started || gameWon || inputFocused) return;
 
         switch (e.code) {
             case 'ArrowLeft':
@@ -898,9 +902,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPaws.addEventListener('click', doPause);
     }
     
-    // Leaderboard button
+    // Leaderboard buttons
     if (btnLeaderboard) {
         btnLeaderboard.addEventListener('click', showLeaderboard);
+    }
+    const btnLeaderboardMobile = document.getElementById('viewLeaderboardMobile');
+    if (btnLeaderboardMobile) {
+        btnLeaderboardMobile.addEventListener('click', showLeaderboard);
     }
     
     // Prevent page scrolling during gameplay
@@ -1034,11 +1042,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function hideLeaderboard() {
         const modal = document.getElementById('leaderboardModal');
         if (modal) modal.classList.remove('show');
-    }
-    
-    // Leaderboard button handlers
-    if (btnLeaderboard) {
-        btnLeaderboard.addEventListener('click', showLeaderboard);
     }
     
     const closeLeaderboard = document.getElementById('closeLeaderboard');

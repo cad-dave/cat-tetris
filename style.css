@@ -718,12 +718,21 @@ body::before {
     }
 }
 
+/* Mobile-only leaderboard button in left sidebar */
+.mobile-leaderboard-btn {
+    display: none;
+}
+
 /* Mobile-only score panel in left sidebar */
 .mobile-score-panel {
     display: none;
 }
 
 @media (max-width: 700px) {
+    .mobile-leaderboard-btn {
+        display: block;
+    }
+
     .mobile-score-panel {
         display: block;
     }
