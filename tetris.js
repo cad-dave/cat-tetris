@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const CONFIG = {
         // 🏆 WIN CONDITION
-        WIN_SCORE: 6000,  // Points needed to win
+        WIN_SCORE: 4500,  // Points needed to win
         
         // 📊 SCORING SYSTEM
         POINTS: {
