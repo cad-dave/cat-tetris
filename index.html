@@ -18,9 +18,6 @@
                 <p class="modal-subtitle">Race to 4500 points - Fastest times win!</p>
                 <div id="leaderboardList" class="leaderboard-list">
                 </div>
-                <div class="modal-actions">
-                    <button class="btn-secondary" id="clearLeaderboard">Clear Records</button>
-                </div>
             </div>
         </div>
     </div>
@@ -35,7 +32,7 @@
                 <p class="modal-subtitle">You reached 4500 points!</p>
                 <div class="time-display-large" id="finalTimeDisplay">0:00.0</div>
                 <div class="name-input-container">
-                    <label class="name-label" for="playerName">Enter your name for the leaderboard:</label>
+                    <label class="name-label" for="playerName">Enter your name:</label>
                     <input 
                         type="text" 
                         id="playerName" 
@@ -43,29 +40,12 @@
                         placeholder="Your name..." 
                         maxlength="32"
                         autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="words"
                     >
-                    <p class="name-hint">Leave blank to save as "Anonymous Cat"</p>
                 </div>
-                <button class="btn-primary" id="saveName">🐾 Save Score</button>
+                <button class="btn-primary btn-save-big" id="saveName">🐾 SAVE MY SCORE!</button>
             </div>
-        </div>
-    </div>
-
-    <!-- MOBILE HEADER BAR -->
-    <div id="mobile-header">
-        <div class="mh-score">
-            <div class="mh-score-num" id="scoreMobile">0</div>
-            <div class="mh-progress-bar">
-                <div class="mh-progress-fill" id="progressBarMobile"></div>
-            </div>
-        </div>
-        <div class="mh-timer">
-            <div class="mh-timer-val" id="timerMobile">0:00.0</div>
-            <div class="mh-best" id="bestTimeMobile">--:--.-</div>
-            <div class="mh-crown" id="recordHolderMobile"></div>
-        </div>
-        <div class="mh-actions">
-            <button class="mh-records-btn" id="viewLeaderboardMobile">🏆</button>
         </div>
     </div>
 
@@ -76,15 +56,11 @@
 
         <main class="container">
             <aside class="sidebar left">
-                <!-- Always visible -->
-                <div class="scorebox next-box">
+                <div class="scorebox">
                     <h3>Next</h3>
                     <canvas id="next" width="120" height="120" aria-label="Next Tetris Piece"></canvas>
                 </div>
-                <button id="btn-paws" class="btn-paws-sidebar">🐾<br>PAWS</button>
-
-                <!-- Desktop only -->
-                <div class="scorebox desktop-only">
+                <div class="scorebox">
                     <h3>⏱️ Time</h3>
                     <div class="timer-display" id="timer">0:00.0</div>
                     <div class="record-display">
@@ -96,10 +72,21 @@
                         <span id="recordHolderName">--</span>
                     </div>
                 </div>
-                <div class="scorebox mobile-leaderboard-btn desktop-only">
-                    <button class="btn-leaderboard" id="viewLeaderboardDesktop">
+                <!-- Mobile-only leaderboard button -->
+                <div class="scorebox mobile-leaderboard-btn">
+                    <button class="btn-leaderboard" id="viewLeaderboardMobile">
                         🏆 View Records
                     </button>
+                </div>
+                <!-- Mobile-only score panel (right sidebar is hidden on small screens) -->
+                <div class="scorebox mobile-score-panel">
+                    <h3>🎯 Score</h3>
+                    <div class="score-large" id="scoreMobile">0</div>
+                    <div class="score-target">/ 4500</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBarMobile"></div>
+                    </div>
+                    <div class="stat-row"><strong>Level:</strong> <span id="levelMobile">1</span></div>
                 </div>
             </aside>
 
@@ -108,6 +95,7 @@
                     <canvas id="tetris" width="200" height="400" aria-label="Tetris Game Board" role="application"></canvas>
                     <canvas id="effects" width="200" height="400" aria-label="Visual Effects Layer"></canvas>
                 </div>
+                <button id="btn-paws" class="btn-paws">🐾 PAWS</button>
             </div>
 
             <aside class="sidebar right">

@@ -73,55 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLeaderboard = document.getElementById('viewLeaderboard');
 
     // ═══════════════════════════════════════════════════════════════════════
-    // 📐 MOBILE CANVAS SIZING — keeps pieces perfectly square
-    // The canvas internal size is 200×400 (10×20 cells at 20px each).
-    // CSS can distort this, so we set CSS width/height explicitly via JS
-    // to match the available space while preserving the 1:2 ratio.
-    // ═══════════════════════════════════════════════════════════════════════
-    function resizeCanvasForMobile() {
-        if (window.innerWidth > 700) return; // desktop handles itself
-        
-        const header = document.getElementById('mobile-header');
-        const controls = document.getElementById('mobile-controls');
-        const sidebar = document.querySelector('.sidebar.left');
-        
-        const headerH = header ? header.offsetHeight : 58;
-        const controlsH = controls ? controls.offsetHeight : 115;
-        const sidebarW = sidebar ? sidebar.offsetWidth : 82;
-        
-        const availH = window.innerHeight - headerH - controlsH - 8;
-        const availW = window.innerWidth - sidebarW - 6;
-        
-        // Canvas must be 1:2 (width:height) — pick the limiting dimension
-        let cw, ch;
-        if (availW * 2 <= availH) {
-            cw = availW;
-            ch = availW * 2;
-        } else {
-            ch = availH;
-            cw = availH / 2;
-        }
-        
-        cw = Math.floor(cw);
-        ch = Math.floor(ch);
-        
-        canvas.style.width = cw + 'px';
-        canvas.style.height = ch + 'px';
-        if (effectsCanvas) {
-            effectsCanvas.style.width = cw + 'px';
-            effectsCanvas.style.height = ch + 'px';
-        }
-    }
-    
-    // Run on load and on resize/orientation change
-    window.addEventListener('resize', resizeCanvasForMobile);
-    window.addEventListener('orientationchange', () => {
-        setTimeout(resizeCanvasForMobile, 200);
-    });
-    // Run after a short delay to let layout settle
-    setTimeout(resizeCanvasForMobile, 100);
-
-    // ═══════════════════════════════════════════════════════════════════════
     // 🔊 IMPROVED AUDIO MANAGEMENT (Fixes audio interruption bugs)
     // ═══════════════════════════════════════════════════════════════════════
     
@@ -426,45 +377,42 @@ document.addEventListener('DOMContentLoaded', () => {
         elapsedTime = Date.now() - gameStartTime;
         const timeStr = leaderboard.formatTime(elapsedTime);
         if (timerEl) timerEl.textContent = timeStr;
-        const mhTimer = document.getElementById('timerMobile');
-        if (mhTimer) mhTimer.textContent = timeStr;
     }
     
     async function updateBestTime() {
-        const holderEl = document.getElementById('recordHolder');
-        const holderNameEl = document.getElementById('recordHolderName');
-        const mhBest = document.getElementById('bestTimeMobile');
-        const mhCrown = document.getElementById('recordHolderMobile');
-
-        function applyBest(timeStr, name) {
-            if (bestTimeEl) bestTimeEl.textContent = timeStr;
-            if (holderEl && holderNameEl) { holderNameEl.textContent = name; holderEl.style.display = 'block'; }
-            if (mhBest) mhBest.textContent = timeStr;
-            if (mhCrown) mhCrown.textContent = '👑 ' + name;
-        }
-        function clearBest() {
-            if (bestTimeEl) bestTimeEl.textContent = '--:--.-';
-            if (holderEl) holderEl.style.display = 'none';
-            if (mhBest) mhBest.textContent = '--:--.-';
-            if (mhCrown) mhCrown.textContent = '';
-        }
-
         try {
             const { getDocs, query, orderBy, limit } = window.firebaseLeaderboard;
             const q = query(window.firebaseLeaderboard.collection, orderBy('time_ms', 'asc'), limit(1));
             const snap = await getDocs(q);
+
+            const holderEl = document.getElementById('recordHolder');
+            const holderNameEl = document.getElementById('recordHolderName');
+
             if (!snap.empty) {
                 const best = snap.docs[0].data();
-                applyBest(leaderboard.formatTime(best.time_ms), best.name || 'Anonymous Cat');
+                if (bestTimeEl) bestTimeEl.textContent = leaderboard.formatTime(best.time_ms);
+                if (holderEl && holderNameEl) {
+                    holderNameEl.textContent = best.name || 'Anonymous Cat';
+                    holderEl.style.display = 'block';
+                }
             } else {
-                clearBest();
+                if (bestTimeEl) bestTimeEl.textContent = '--:--.-';
+                if (holderEl) holderEl.style.display = 'none';
             }
         } catch (e) {
+            // Fallback to localStorage
             const records = JSON.parse(localStorage.getItem('tetrisLeaderboard') || '[]');
+            const holderEl = document.getElementById('recordHolder');
+            const holderNameEl = document.getElementById('recordHolderName');
             if (records.length > 0) {
-                applyBest(leaderboard.formatTime(records[0].time_ms || records[0].time), records[0].name || 'Anonymous Cat');
+                if (bestTimeEl) bestTimeEl.textContent = leaderboard.formatTime(records[0].time_ms || records[0].time);
+                if (holderEl && holderNameEl) {
+                    holderNameEl.textContent = records[0].name || 'Anonymous Cat';
+                    holderEl.style.display = 'block';
+                }
             } else {
-                clearBest();
+                if (bestTimeEl) bestTimeEl.textContent = '--:--.-';
+                if (holderEl) holderEl.style.display = 'none';
             }
         }
     }
@@ -721,16 +669,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const levelEl = document.getElementById('level');
         const linesEl = document.getElementById('lines');
         const scoreMobileEl = document.getElementById('scoreMobile');
+        const levelMobileEl = document.getElementById('levelMobile');
         const progressBarMobileEl = document.getElementById('progressBarMobile');
 
         if (scoreEl) scoreEl.innerText = player.score;
         if (levelEl) levelEl.innerText = player.level;
         if (linesEl) linesEl.innerText = player.lines;
         if (scoreMobileEl) scoreMobileEl.innerText = player.score;
-
-        const progress = Math.min((player.score / CONFIG.WIN_SCORE) * 100, 100);
-        if (progressBarEl) progressBarEl.style.width = `${progress}%`;
-        if (progressBarMobileEl) progressBarMobileEl.style.width = `${progress}%`;
+        if (levelMobileEl) levelMobileEl.innerText = player.level;
+        
+        // Update progress bars
+        if (progressBarEl) {
+            const progress = (player.score / CONFIG.WIN_SCORE) * 100;
+            progressBarEl.style.width = `${Math.min(progress, 100)}%`;
+        }
+        if (progressBarMobileEl) {
+            const progress = (player.score / CONFIG.WIN_SCORE) * 100;
+            progressBarMobileEl.style.width = `${Math.min(progress, 100)}%`;
+        }
     }
 
     function update(time = 0) {
@@ -930,7 +886,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!paused && !gameWon && started) playerRotate(1);
     }, false);
 
-    // PAWS button (sidebar)
+    // PAWS button (mobile, below the canvas)
     const btnPaws = document.getElementById('btn-paws');
     if (btnPaws) {
         let pawsLastTap = 0;
@@ -938,7 +894,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             e.stopPropagation();
             const now = Date.now();
-            if (now - pawsLastTap < 200) return;
+            if (now - pawsLastTap < 200) return; // debounce
             pawsLastTap = now;
             if (!gameWon) handlePauseToggle();
         };
@@ -946,10 +902,14 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPaws.addEventListener('click', doPause);
     }
     
-    // Leaderboard buttons (desktop + mobile header)
-    if (btnLeaderboard) btnLeaderboard.addEventListener('click', showLeaderboard);
+    // Leaderboard buttons
+    if (btnLeaderboard) {
+        btnLeaderboard.addEventListener('click', showLeaderboard);
+    }
     const btnLeaderboardMobile = document.getElementById('viewLeaderboardMobile');
-    if (btnLeaderboardMobile) btnLeaderboardMobile.addEventListener('click', showLeaderboard);
+    if (btnLeaderboardMobile) {
+        btnLeaderboardMobile.addEventListener('click', showLeaderboard);
+    }
     
     // Prevent page scrolling during gameplay
     const mobileControls = document.getElementById('mobile-controls');
@@ -1001,7 +961,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) modal.classList.remove('show');
     }
     
+    let isSavingScore = false;
+
     async function savePlayerName() {
+        if (isSavingScore) return; // prevent double submit
+        isSavingScore = true;
+
         const input = document.getElementById('playerName');
         let playerName = input ? input.value.trim() : '';
         
@@ -1009,16 +974,19 @@ document.addEventListener('DOMContentLoaded', () => {
             playerName = 'Anonymous Cat';
         }
         
-        // Show saving indicator
+        // Disable button immediately
         const saveBtn = document.getElementById('saveName');
-        if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
+        if (saveBtn) { 
+            saveBtn.textContent = '⏳ Saving...'; 
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.7';
+        }
 
         await leaderboard.add(elapsedTime, playerName);
         await updateBestTime();
         
-        if (saveBtn) { saveBtn.textContent = '🐾 Save Score'; saveBtn.disabled = false; }
-
         hideNameInputModal();
+        isSavingScore = false;
         
         setTimeout(() => {
             if (startBtn) startBtn.style.display = 'block';
@@ -1089,13 +1057,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeLeaderboard.addEventListener('click', hideLeaderboard);
     }
     
-    const clearLeaderboardBtn = document.getElementById('clearLeaderboard');
-    if (clearLeaderboardBtn) {
-        clearLeaderboardBtn.addEventListener('click', () => {
-            alert('To clear global records, please delete them from the Firebase Console.\n\nhttps://console.firebase.google.com');
-        });
-    }
-    
     // Close modal when clicking outside
     const modal = document.getElementById('leaderboardModal');
     if (modal) {
@@ -1122,6 +1083,7 @@ document.addEventListener('DOMContentLoaded', () => {
             paused = false;
             started = true;
             gameWon = false;
+            isSavingScore = false;
             effects.particles = [];
             
             // Prime audio elements for mobile playback

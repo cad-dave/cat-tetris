@@ -15,7 +15,7 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     overflow-y: auto;
-    -webkit-tap-highlight-color: transparent; 
+    -webkit-tap-highlight-color: transparent;
     user-select: none;
 }
 
@@ -43,7 +43,7 @@ body::before {
 
 .startBtn {
     position: absolute;
-    z-index: 10;
+    z-index: 100;
     background: url('petstart.jpg') no-repeat center center / cover; 
     background-color: #333;
     font-size: 1.5rem;
@@ -53,6 +53,7 @@ body::before {
     border: 5px solid gold;
     border-radius: 12px;
     cursor: pointer;
+    touch-action: manipulation;
     box-shadow: 
         0 0 30px rgba(255, 215, 0, 0.8),
         0 10px 40px rgba(0, 0, 0, 0.5);
@@ -603,46 +604,45 @@ body::before {
     color: #ccc;
 }
 
-/* ═══════════════════════════════
-   MOBILE CONTROLS
-═══════════════════════════════ */
+/* Mobile Controls */
 #mobile-controls {
     display: none;
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
+    height: 130px;
+    background-color: rgba(0, 0, 0, 0.92);
     justify-content: space-between;
     align-items: center;
-    padding: 10px 12px;
-    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    padding: 12px 20px;
     box-sizing: border-box;
     z-index: 1000;
-    border-top: 2px solid rgba(255, 215, 0, 0.6);
+    border-top: 2px solid rgba(13, 194, 255, 0.3);
 }
 
 .center-controls {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
     align-items: center;
 }
 
 #mobile-controls button {
-    border: 3px solid rgba(255, 255, 255, 0.5);
-    border-radius: 16px;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
     color: white;
-    font-size: 28px;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
+    padding: 18px 20px;
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
-    width: 95px;
-    height: 95px;
+    min-width: 75px;
+    min-height: 75px;
     transition: all 0.05s;
     background: rgba(0, 123, 255, 0.95);
     position: relative;
@@ -654,275 +654,163 @@ body::before {
 #mobile-controls button::after {
     content: '';
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
+    border-radius: 6px;
     opacity: 0;
     transition: opacity 0.05s;
 }
-#mobile-controls button:active::after { opacity: 1; }
-.move-btn { background: rgba(0, 123, 255, 0.95); }
-.action-btn { background: rgba(40, 167, 69, 0.95); height: 88px; }
+
+#mobile-controls button:active::after {
+    opacity: 1;
+}
+
+.move-btn {
+    background: rgba(0, 123, 255, 0.95);
+}
+
+.action-btn {
+    background: rgba(40, 167, 69, 0.95);
+    min-height: 72px;
+}
+
 #mobile-controls button:active {
     filter: brightness(140%);
-    transform: scale(0.93);
+    transform: scale(0.94);
     box-shadow: 0 0 25px rgba(255, 255, 255, 0.7);
-    border-color: white;
+    border-color: rgba(255, 255, 255, 0.9);
 }
 
-/* Hide old mobile-only elements */
-.mobile-score-panel,
-.mobile-leaderboard-btn,
-.btn-paws { display: none !important; }
+/* PAWS button - mobile only, sits below the game canvas */
+.btn-paws {
+    display: none;
+}
 
-/* PAWS sidebar button — hidden on desktop */
-.btn-paws-sidebar { display: none; }
-
-/* Desktop-only elements */
-.desktop-only { display: block; }
-
-/* Mobile header — hidden on desktop */
-#mobile-header { display: none; }
-
-/* ═══════════════════════════════
-   MOBILE LAYOUT
-   Tested: iPhone Safari + Chrome
-═══════════════════════════════ */
 @media (max-width: 700px) {
-
-    body {
-        align-items: flex-start;
-        overflow-x: hidden;
-        overflow-y: hidden; /* prevent page scroll during game */
-    }
-
-    /* ── Header bar ── */
-    #mobile-header {
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 500;
-        align-items: center;
-        justify-content: space-between;
-        padding: max(12px, env(safe-area-inset-top)) 10px 8px 10px;
-        background: rgba(0, 0, 0, 0.5);
-        border-bottom: 2px solid rgba(255, 215, 0, 0.8);
-        box-sizing: border-box;
-        gap: 8px;
-    }
-
-    .mh-score {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        min-width: 60px;
-    }
-    .mh-score-num {
-        font-size: 1.25rem;
-        font-weight: 900;
-        color: #FF0D72;
-        text-shadow: 0 0 8px rgba(255,13,114,0.8);
-        line-height: 1;
-        font-variant-numeric: tabular-nums;
-    }
-    .mh-progress-bar {
-        width: 60px;
-        height: 5px;
-        background: #222;
-        border-radius: 3px;
-        overflow: hidden;
-        margin-top: 4px;
-    }
-    .mh-progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #FF0D72, #0DC2FF);
-        width: 0%;
-        transition: width 0.3s ease;
-    }
-
-    .mh-timer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-    }
-    .mh-timer-val {
-        font-size: 1.5rem;
-        font-weight: 900;
-        color: #0DC2FF;
-        text-shadow: 0 0 8px rgba(13,194,255,0.8);
-        font-variant-numeric: tabular-nums;
-        line-height: 1;
-    }
-    .mh-best {
-        font-size: 0.65rem;
-        color: #FFD700;
-        margin-top: 2px;
-        font-variant-numeric: tabular-nums;
-    }
-    .mh-crown {
-        font-size: 0.6rem;
-        color: #FFD700;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 120px;
-    }
-
-    .mh-actions { display: flex; align-items: center; }
-    .mh-records-btn {
-        background: transparent;
-        border: 2px solid rgba(255,215,0,0.8);
+    .btn-paws {
+        display: block;
+        width: 212px; /* matches canvas width + border */
+        margin-top: 10px;
+        padding: 14px 0;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+        border: 2px solid rgba(255, 215, 0, 0.7);
         border-radius: 10px;
         color: #FFD700;
-        font-size: 1.6rem;
-        padding: 4px 10px;
-        cursor: pointer;
-        touch-action: manipulation;
-        -webkit-tap-highlight-color: transparent;
-        line-height: 1;
-    }
-    .mh-records-btn:active { background: rgba(255,215,0,0.2); }
-
-    /* ── Game wrapper ── */
-    .game-wrapper {
-        display: flex;
-        width: 100%;
-        align-items: flex-start;
-        padding-top: 58px;  /* clears header */
-        padding-bottom: 0;
-        margin: 0;
-        height: 100dvh;
-        overflow: hidden;
-    }
-
-    /* ── Container ── */
-    .container {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        padding: 0;
-        gap: 0;
-        background: none;
-        box-shadow: none;
-        border-radius: 0;
-        width: 100%;
-        height: 100%;
-    }
-
-    /* ── Right sidebar: hide ── */
-    .sidebar.right { display: none; }
-
-    /* ── Left sidebar: narrow ── */
-    .sidebar.left {
-        width: 82px;
-        min-width: 82px;
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        padding: 6px 0 6px 4px;
-        align-items: center;
-    }
-    .sidebar.left .scorebox { padding: 6px; width: 100%; }
-    .sidebar.left .scorebox h3 { font-size: 0.7rem; margin-bottom: 4px; }
-    .desktop-only { display: none !important; }
-
-    /* Scale next canvas to sidebar */
-    #next { width: 66px !important; height: 66px !important; }
-
-    /* ── PAWS sidebar button ── */
-    .btn-paws-sidebar {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 70px;
-        height: 70px;
-        flex-shrink: 0;
-        background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.15));
-        border: 2px solid rgba(255,215,0,0.8);
-        border-radius: 12px;
-        color: #FFD700;
-        font-size: 0.8rem;
+        font-size: 1.4rem;
         font-weight: 900;
-        line-height: 1.3;
+        letter-spacing: 3px;
         cursor: pointer;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        transition: all 0.1s ease;
         user-select: none;
     }
-    .btn-paws-sidebar:active {
-        background: rgba(255,215,0,0.3);
-        transform: scale(0.95);
+
+    .btn-paws:active {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 140, 0, 0.4));
+        border-color: #FFD700;
+        transform: scale(0.97);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
     }
-
-    /* ── Game area ── */
-    .game-area {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        /* height = viewport minus header (58px) minus controls bar (~115px) */
-        height: calc(100dvh - 58px - 115px);
-        padding: 4px 3px 0 0;
-    }
-
-    /* ── Canvas wrapper fills game area ── */
-    .canvas-wrapper {
-        flex: 1;
-        position: relative;
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-end;
-        height: 100%;
-    }
-
-    /*
-     * KEY FIX: Canvas must stay 1:2 ratio (10 cols × 20 rows)
-     * We use height-based sizing so pieces stay square.
-     * JS also resizes the canvas element to match.
-     */
-    #tetris {
-        /* fill height, width = height/2 */
-        height: 100%;
-        width: auto;
-        aspect-ratio: 1 / 2;
-        max-width: 100%;
-        display: block;
-    }
-    #effects {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        width: auto;
-        aspect-ratio: 1 / 2;
-        pointer-events: none;
-    }
-
-    /* ── Show mobile controls ── */
-    #mobile-controls { display: flex; }
-
-    /* ── Start button ── */
-    .startBtn { z-index: 200; touch-action: manipulation; }
-
-    /* ── Modals ── */
-    .modal-content { width: 95%; max-width: none; max-height: 88vh; }
 }
 
-/* Animation classes */
+/* Big prominent save button on win modal */
+.btn-save-big {
+    font-size: 1.5rem;
+    padding: 20px;
+    letter-spacing: 2px;
+    margin-top: 10px;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+    touch-action: manipulation;
+}
+
+/* Mobile-only leaderboard button in left sidebar */
+.mobile-leaderboard-btn {
+    display: none;
+}
+
+/* Mobile-only score panel in left sidebar */
+.mobile-score-panel {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .mobile-leaderboard-btn {
+        display: block;
+    }
+
+    .mobile-score-panel {
+        display: block;
+    }
+
+    .sidebar.left .controls-info {
+        display: none !important;
+    }
+
+    .sidebar.right {
+        display: none;
+    }
+
+    .game-wrapper {
+        align-items: flex-start;
+        margin-top: 75px;
+        min-height: auto;
+        padding-bottom: 180px;
+    }
+
+    .container {
+        transform: scale(0.85);
+        transform-origin: top center;
+        padding: 0;
+        margin-top: 0;
+        gap: 0;
+    }
+
+    #mobile-controls {
+        display: flex;
+        height: 130px;
+        padding-bottom: env(safe-area-inset-bottom, 12px);
+    }
+
+    .startBtn {
+        touch-action: manipulation;
+        z-index: 200;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-width: none;
+    }
+
+    .btn-leaderboard {
+        touch-action: manipulation;
+    }
+
+    .btn-paws {
+        touch-action: manipulation;
+    }
+}
+
+/* Animation classes for visual effects */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
 }
-.shake { animation: shake 0.3s ease; }
+
+.shake {
+    animation: shake 0.3s ease;
+}
 
 @keyframes flash {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
-.flash { animation: flash 0.2s ease; }
+
+.flash {
+    animation: flash 0.2s ease;
+}
