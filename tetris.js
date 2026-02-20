@@ -377,6 +377,9 @@ document.addEventListener('DOMContentLoaded', () => {
         elapsedTime = Date.now() - gameStartTime;
         const timeStr = leaderboard.formatTime(elapsedTime);
         if (timerEl) timerEl.textContent = timeStr;
+        // Sync mobile header timer
+        const timerMobileEl = document.getElementById('timerMobile');
+        if (timerMobileEl) timerMobileEl.textContent = timeStr;
     }
     
     async function updateBestTime() {
@@ -387,32 +390,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const holderEl = document.getElementById('recordHolder');
             const holderNameEl = document.getElementById('recordHolderName');
+            const bestTimeMobileEl = document.getElementById('bestTimeMobile');
+            const recordHolderMobileEl = document.getElementById('recordHolderMobile');
 
             if (!snap.empty) {
                 const best = snap.docs[0].data();
-                if (bestTimeEl) bestTimeEl.textContent = leaderboard.formatTime(best.time_ms);
+                const timeStr = leaderboard.formatTime(best.time_ms);
+                const name = best.name || 'Anonymous Cat';
+
+                if (bestTimeEl) bestTimeEl.textContent = timeStr;
                 if (holderEl && holderNameEl) {
-                    holderNameEl.textContent = best.name || 'Anonymous Cat';
+                    holderNameEl.textContent = name;
                     holderEl.style.display = 'block';
                 }
+                // Mobile header
+                if (bestTimeMobileEl) bestTimeMobileEl.textContent = timeStr;
+                if (recordHolderMobileEl) recordHolderMobileEl.textContent = '👑 ' + name;
             } else {
                 if (bestTimeEl) bestTimeEl.textContent = '--:--.-';
                 if (holderEl) holderEl.style.display = 'none';
+                if (bestTimeMobileEl) bestTimeMobileEl.textContent = '--:--.-';
+                if (recordHolderMobileEl) recordHolderMobileEl.textContent = '';
             }
         } catch (e) {
-            // Fallback to localStorage
             const records = JSON.parse(localStorage.getItem('tetrisLeaderboard') || '[]');
             const holderEl = document.getElementById('recordHolder');
             const holderNameEl = document.getElementById('recordHolderName');
+            const bestTimeMobileEl = document.getElementById('bestTimeMobile');
+            const recordHolderMobileEl = document.getElementById('recordHolderMobile');
             if (records.length > 0) {
-                if (bestTimeEl) bestTimeEl.textContent = leaderboard.formatTime(records[0].time_ms || records[0].time);
-                if (holderEl && holderNameEl) {
-                    holderNameEl.textContent = records[0].name || 'Anonymous Cat';
-                    holderEl.style.display = 'block';
-                }
+                const timeStr = leaderboard.formatTime(records[0].time_ms || records[0].time);
+                const name = records[0].name || 'Anonymous Cat';
+                if (bestTimeEl) bestTimeEl.textContent = timeStr;
+                if (holderEl && holderNameEl) { holderNameEl.textContent = name; holderEl.style.display = 'block'; }
+                if (bestTimeMobileEl) bestTimeMobileEl.textContent = timeStr;
+                if (recordHolderMobileEl) recordHolderMobileEl.textContent = '👑 ' + name;
             } else {
                 if (bestTimeEl) bestTimeEl.textContent = '--:--.-';
                 if (holderEl) holderEl.style.display = 'none';
+                if (bestTimeMobileEl) bestTimeMobileEl.textContent = '--:--.-';
+                if (recordHolderMobileEl) recordHolderMobileEl.textContent = '';
             }
         }
     }
@@ -668,25 +685,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const scoreEl = document.getElementById('score');
         const levelEl = document.getElementById('level');
         const linesEl = document.getElementById('lines');
+        // Mobile header elements
         const scoreMobileEl = document.getElementById('scoreMobile');
-        const levelMobileEl = document.getElementById('levelMobile');
         const progressBarMobileEl = document.getElementById('progressBarMobile');
 
         if (scoreEl) scoreEl.innerText = player.score;
         if (levelEl) levelEl.innerText = player.level;
         if (linesEl) linesEl.innerText = player.lines;
         if (scoreMobileEl) scoreMobileEl.innerText = player.score;
-        if (levelMobileEl) levelMobileEl.innerText = player.level;
-        
+
         // Update progress bars
-        if (progressBarEl) {
-            const progress = (player.score / CONFIG.WIN_SCORE) * 100;
-            progressBarEl.style.width = `${Math.min(progress, 100)}%`;
-        }
-        if (progressBarMobileEl) {
-            const progress = (player.score / CONFIG.WIN_SCORE) * 100;
-            progressBarMobileEl.style.width = `${Math.min(progress, 100)}%`;
-        }
+        const progress = Math.min((player.score / CONFIG.WIN_SCORE) * 100, 100);
+        if (progressBarEl) progressBarEl.style.width = `${progress}%`;
+        if (progressBarMobileEl) progressBarMobileEl.style.width = `${progress}%`;
     }
 
     function update(time = 0) {
@@ -886,20 +897,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!paused && !gameWon && started) playerRotate(1);
     }, false);
 
-    // PAWS button (mobile, below the canvas)
-    const btnPaws = document.getElementById('btn-paws');
-    if (btnPaws) {
+    // PAWS button (sidebar version)
+    const btnPawsSidebar = document.getElementById('btn-paws');
+    if (btnPawsSidebar) {
         let pawsLastTap = 0;
         const doPause = (e) => {
             e.preventDefault();
             e.stopPropagation();
             const now = Date.now();
-            if (now - pawsLastTap < 200) return; // debounce
+            if (now - pawsLastTap < 200) return;
             pawsLastTap = now;
             if (!gameWon) handlePauseToggle();
         };
-        btnPaws.addEventListener('touchstart', doPause, { passive: false });
-        btnPaws.addEventListener('click', doPause);
+        btnPawsSidebar.addEventListener('touchstart', doPause, { passive: false });
+        btnPawsSidebar.addEventListener('click', doPause);
     }
     
     // Leaderboard buttons
@@ -961,12 +972,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) modal.classList.remove('show');
     }
     
-    let isSavingScore = false;
-
     async function savePlayerName() {
-        if (isSavingScore) return; // prevent double submit
-        isSavingScore = true;
-
         const input = document.getElementById('playerName');
         let playerName = input ? input.value.trim() : '';
         
@@ -974,19 +980,16 @@ document.addEventListener('DOMContentLoaded', () => {
             playerName = 'Anonymous Cat';
         }
         
-        // Disable button immediately
+        // Show saving indicator
         const saveBtn = document.getElementById('saveName');
-        if (saveBtn) { 
-            saveBtn.textContent = '⏳ Saving...'; 
-            saveBtn.disabled = true;
-            saveBtn.style.opacity = '0.7';
-        }
+        if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
 
         await leaderboard.add(elapsedTime, playerName);
         await updateBestTime();
         
+        if (saveBtn) { saveBtn.textContent = '🐾 Save Score'; saveBtn.disabled = false; }
+
         hideNameInputModal();
-        isSavingScore = false;
         
         setTimeout(() => {
             if (startBtn) startBtn.style.display = 'block';
@@ -1057,6 +1060,13 @@ document.addEventListener('DOMContentLoaded', () => {
         closeLeaderboard.addEventListener('click', hideLeaderboard);
     }
     
+    const clearLeaderboardBtn = document.getElementById('clearLeaderboard');
+    if (clearLeaderboardBtn) {
+        clearLeaderboardBtn.addEventListener('click', () => {
+            alert('To clear global records, please delete them from the Firebase Console.\n\nhttps://console.firebase.google.com');
+        });
+    }
+    
     // Close modal when clicking outside
     const modal = document.getElementById('leaderboardModal');
     if (modal) {
@@ -1083,7 +1093,6 @@ document.addEventListener('DOMContentLoaded', () => {
             paused = false;
             started = true;
             gameWon = false;
-            isSavingScore = false;
             effects.particles = [];
             
             // Prime audio elements for mobile playback
