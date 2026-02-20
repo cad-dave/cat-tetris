@@ -603,7 +603,9 @@ body::before {
     color: #ccc;
 }
 
-/* Mobile Controls */
+/* ═══════════════════════════════════════════
+   MOBILE CONTROLS (fixed bottom bar)
+═══════════════════════════════════════════ */
 #mobile-controls {
     display: none;
     position: fixed;
@@ -617,7 +619,7 @@ body::before {
     padding-bottom: max(10px, env(safe-area-inset-bottom));
     box-sizing: border-box;
     z-index: 1000;
-    border-top: 2px solid rgba(255, 215, 0, 0.4);
+    border-top: 2px solid rgba(255, 215, 0, 0.5);
 }
 
 .center-controls {
@@ -631,7 +633,7 @@ body::before {
     border: 3px solid rgba(255, 255, 255, 0.4);
     border-radius: 14px;
     color: white;
-    font-size: 24px;
+    font-size: 26px;
     font-weight: bold;
     cursor: pointer;
     touch-action: none;
@@ -676,20 +678,9 @@ body::before {
 }
 
 /* ═══════════════════════════════════════════
-   MOBILE HEADER BAR
-═══════════════════════════════════════════ */
-#mobile-header {
-    display: none;
-}
-
-/* ═══════════════════════════════════════════
-   PAWS BUTTON IN SIDEBAR (mobile)
+   PAWS SIDEBAR BUTTON (desktop hidden)
 ═══════════════════════════════════════════ */
 .btn-paws-sidebar {
-    display: none;
-}
-
-.sidebar-paws {
     display: none;
 }
 
@@ -697,20 +688,32 @@ body::before {
 .desktop-only { display: block; }
 
 /* ═══════════════════════════════════════════
+   MOBILE HEADER BAR (hidden on desktop)
+═══════════════════════════════════════════ */
+#mobile-header {
+    display: none;
+}
+
+/* Hide old mobile-only panels */
+.mobile-score-panel,
+.mobile-leaderboard-btn,
+.btn-paws {
+    display: none !important;
+}
+
+/* ═══════════════════════════════════════════
    MOBILE MEDIA QUERY
-   Target: iPhone Safari + Chrome iPhone
-   Uses safe-area-inset for notch/home bar
+   Safari iPhone + Chrome iPhone
 ═══════════════════════════════════════════ */
 @media (max-width: 700px) {
 
-    /* ── Body ── */
     body {
         align-items: flex-start;
         overflow-x: hidden;
         overflow-y: auto;
     }
 
-    /* ── Header bar ── */
+    /* ── Mobile header bar ── */
     #mobile-header {
         display: flex;
         position: fixed;
@@ -720,23 +723,23 @@ body::before {
         z-index: 500;
         align-items: center;
         justify-content: space-between;
-        padding: max(8px, env(safe-area-inset-top)) 12px 8px 12px;
+        padding: max(10px, env(safe-area-inset-top)) 10px 8px 10px;
         background: transparent;
-        border-bottom: 2px solid rgba(255, 215, 0, 0.7);
+        border-bottom: 2px solid rgba(255, 215, 0, 0.8);
         box-sizing: border-box;
-        gap: 8px;
-        min-height: 56px;
+        gap: 6px;
+        min-height: 52px;
     }
 
-    /* Score section (left) */
+    /* Score (left) */
     .mh-score {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        min-width: 70px;
+        min-width: 65px;
     }
     .mh-score-num {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: 900;
         color: #FF0D72;
         text-shadow: 0 0 8px rgba(255, 13, 114, 0.8);
@@ -744,13 +747,13 @@ body::before {
         font-variant-numeric: tabular-nums;
     }
     .mh-progress-bar {
-        width: 70px;
+        width: 65px;
         height: 4px;
         background: #1a1a1a;
         border-radius: 2px;
         overflow: hidden;
         margin-top: 3px;
-        border: 1px solid #333;
+        border: 1px solid #444;
     }
     .mh-progress-fill {
         height: 100%;
@@ -759,7 +762,7 @@ body::before {
         transition: width 0.3s ease;
     }
 
-    /* Timer section (centre) */
+    /* Timer (centre) */
     .mh-timer {
         display: flex;
         flex-direction: column;
@@ -767,7 +770,7 @@ body::before {
         flex: 1;
     }
     .mh-timer-val {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         font-weight: 900;
         color: #0DC2FF;
         text-shadow: 0 0 8px rgba(13, 194, 255, 0.8);
@@ -775,53 +778,48 @@ body::before {
         line-height: 1;
     }
     .mh-best {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
         color: #FFD700;
         margin-top: 2px;
         display: flex;
         align-items: center;
-        gap: 3px;
+        gap: 2px;
         white-space: nowrap;
     }
     .mh-crown {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
         color: #FFD700;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 80px;
+        max-width: 75px;
         white-space: nowrap;
+        display: block;
     }
 
-    /* Actions section (right) */
-    .mh-actions {
-        display: flex;
-        align-items: center;
-    }
+    /* Records button (right) */
+    .mh-actions { display: flex; align-items: center; }
     .mh-records-btn {
         background: transparent;
-        border: 2px solid rgba(255, 215, 0, 0.7);
+        border: 2px solid rgba(255, 215, 0, 0.8);
         border-radius: 8px;
         color: #FFD700;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         padding: 4px 8px;
         cursor: pointer;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
         line-height: 1;
     }
-    .mh-records-btn:active {
-        background: rgba(255, 215, 0, 0.2);
-    }
+    .mh-records-btn:active { background: rgba(255, 215, 0, 0.2); }
 
     /* ── Game wrapper ── */
     .game-wrapper {
         width: 100%;
         display: flex;
-        justify-content: flex-end;
+        justify-content: flex-start;
         align-items: flex-start;
-        padding-top: 64px;
-        padding-bottom: 215px;
-        padding-right: 0;
+        padding-top: 56px;
+        padding-bottom: 220px;
         margin: 0;
         min-height: 100vh;
     }
@@ -837,101 +835,91 @@ body::before {
         box-shadow: none;
         border-radius: 0;
         width: 100%;
-        justify-content: flex-end;
     }
 
-    /* ── Right sidebar: hide on mobile ── */
-    .sidebar.right {
-        display: none;
-    }
+    /* ── Right sidebar: hidden ── */
+    .sidebar.right { display: none; }
 
     /* ── Left sidebar: narrow, next + paws only ── */
     .sidebar.left {
-        width: 90px;
-        min-width: 90px;
+        width: 80px;
+        min-width: 80px;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        padding: 8px 0 8px 8px;
+        gap: 6px;
+        padding: 6px 0 6px 4px;
+        align-items: center;
     }
 
     .sidebar.left .scorebox {
-        padding: 8px;
+        padding: 6px;
+        width: 100%;
     }
 
     .sidebar.left .scorebox h3 {
-        font-size: 0.75rem;
-        margin-bottom: 6px;
+        font-size: 0.7rem;
+        margin-bottom: 4px;
     }
 
-    /* Hide desktop-only elements in sidebar */
-    .sidebar.left .desktop-only {
-        display: none;
+    /* Hide desktop-only in sidebar */
+    .desktop-only { display: none; }
+
+    /* Next piece canvas scaled to sidebar width */
+    #next {
+        width: 64px !important;
+        height: 64px !important;
     }
 
-    /* ── PAWS in sidebar ── */
-    .sidebar-paws {
-        display: block;
-        padding: 0 !important;
-        border: none !important;
-        background: none !important;
-        box-shadow: none !important;
-    }
-
+    /* ── PAWS button in sidebar ── */
     .btn-paws-sidebar {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        width: 74px;
-        min-height: 74px;
+        width: 68px;
+        height: 68px;
         background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.15));
-        border: 2px solid rgba(255, 215, 0, 0.7);
+        border: 2px solid rgba(255, 215, 0, 0.8);
         border-radius: 10px;
         color: #FFD700;
-        font-size: 1.1rem;
+        font-size: 0.85rem;
         font-weight: 900;
-        line-height: 1.2;
+        line-height: 1.3;
         cursor: pointer;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
         text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
         user-select: none;
+        flex-shrink: 0;
     }
-
     .btn-paws-sidebar:active {
         background: linear-gradient(135deg, rgba(255, 215, 0, 0.35), rgba(255, 140, 0, 0.35));
         transform: scale(0.96);
     }
 
-    /* ── Game area: fill remaining space ── */
+    /* ── Game area fills remaining space ── */
     .game-area {
         flex: 1;
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
-        padding-right: 4px;
+        align-items: stretch;
+        padding: 4px 2px 0 2px;
     }
 
-    /* ── Canvas: scale to fill available width ── */
+    /* ── Canvas fills available width ── */
     .canvas-wrapper {
         width: 100%;
-        display: flex;
-        justify-content: flex-end;
+        position: relative;
+        display: block;
+        line-height: 0;
     }
 
     #tetris, #effects {
-        width: calc(100vw - 106px);
-        height: calc((100vw - 106px) * 2);
-        max-height: calc(100vh - 280px);
-        max-width: 100%;
-    }
-
-    /* ── Mobile controls ── */
-    #mobile-controls {
-        display: flex;
-        height: auto;
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 2;
+        display: block;
     }
 
     /* ── Start button ── */
@@ -940,18 +928,14 @@ body::before {
         touch-action: manipulation;
     }
 
+    /* ── Mobile controls show ── */
+    #mobile-controls { display: flex; }
+
     /* ── Modals ── */
     .modal-content {
         width: 95%;
         max-width: none;
-        max-height: 85vh;
-    }
-
-    /* ── Hide old mobile panels ── */
-    .mobile-score-panel,
-    .mobile-leaderboard-btn,
-    .btn-paws {
-        display: none !important;
+        max-height: 88vh;
     }
 }
 
@@ -962,15 +946,11 @@ body::before {
     75% { transform: translateX(5px); }
 }
 
-.shake {
-    animation: shake 0.3s ease;
-}
+.shake { animation: shake 0.3s ease; }
 
 @keyframes flash {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
 
-.flash {
-    animation: flash 0.2s ease;
-}
+.flash { animation: flash 0.2s ease; }

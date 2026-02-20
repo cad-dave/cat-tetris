@@ -377,59 +377,49 @@ document.addEventListener('DOMContentLoaded', () => {
         elapsedTime = Date.now() - gameStartTime;
         const timeStr = leaderboard.formatTime(elapsedTime);
         if (timerEl) timerEl.textContent = timeStr;
-        // Sync mobile header timer
-        const timerMobileEl = document.getElementById('timerMobile');
-        if (timerMobileEl) timerMobileEl.textContent = timeStr;
+        const mhTimer = document.getElementById('timerMobile');
+        if (mhTimer) mhTimer.textContent = timeStr;
     }
     
     async function updateBestTime() {
+        const holderEl = document.getElementById('recordHolder');
+        const holderNameEl = document.getElementById('recordHolderName');
+        const mhBest = document.getElementById('bestTimeMobile');
+        const mhCrown = document.getElementById('recordHolderMobile');
+
         try {
             const { getDocs, query, orderBy, limit } = window.firebaseLeaderboard;
             const q = query(window.firebaseLeaderboard.collection, orderBy('time_ms', 'asc'), limit(1));
             const snap = await getDocs(q);
 
-            const holderEl = document.getElementById('recordHolder');
-            const holderNameEl = document.getElementById('recordHolderName');
-            const bestTimeMobileEl = document.getElementById('bestTimeMobile');
-            const recordHolderMobileEl = document.getElementById('recordHolderMobile');
-
             if (!snap.empty) {
                 const best = snap.docs[0].data();
                 const timeStr = leaderboard.formatTime(best.time_ms);
                 const name = best.name || 'Anonymous Cat';
-
                 if (bestTimeEl) bestTimeEl.textContent = timeStr;
-                if (holderEl && holderNameEl) {
-                    holderNameEl.textContent = name;
-                    holderEl.style.display = 'block';
-                }
-                // Mobile header
-                if (bestTimeMobileEl) bestTimeMobileEl.textContent = timeStr;
-                if (recordHolderMobileEl) recordHolderMobileEl.textContent = '👑 ' + name;
+                if (holderEl && holderNameEl) { holderNameEl.textContent = name; holderEl.style.display = 'block'; }
+                if (mhBest) mhBest.textContent = timeStr;
+                if (mhCrown) mhCrown.textContent = '👑 ' + name;
             } else {
                 if (bestTimeEl) bestTimeEl.textContent = '--:--.-';
                 if (holderEl) holderEl.style.display = 'none';
-                if (bestTimeMobileEl) bestTimeMobileEl.textContent = '--:--.-';
-                if (recordHolderMobileEl) recordHolderMobileEl.textContent = '';
+                if (mhBest) mhBest.textContent = '--:--.-';
+                if (mhCrown) mhCrown.textContent = '';
             }
         } catch (e) {
             const records = JSON.parse(localStorage.getItem('tetrisLeaderboard') || '[]');
-            const holderEl = document.getElementById('recordHolder');
-            const holderNameEl = document.getElementById('recordHolderName');
-            const bestTimeMobileEl = document.getElementById('bestTimeMobile');
-            const recordHolderMobileEl = document.getElementById('recordHolderMobile');
             if (records.length > 0) {
                 const timeStr = leaderboard.formatTime(records[0].time_ms || records[0].time);
                 const name = records[0].name || 'Anonymous Cat';
                 if (bestTimeEl) bestTimeEl.textContent = timeStr;
                 if (holderEl && holderNameEl) { holderNameEl.textContent = name; holderEl.style.display = 'block'; }
-                if (bestTimeMobileEl) bestTimeMobileEl.textContent = timeStr;
-                if (recordHolderMobileEl) recordHolderMobileEl.textContent = '👑 ' + name;
+                if (mhBest) mhBest.textContent = timeStr;
+                if (mhCrown) mhCrown.textContent = '👑 ' + name;
             } else {
                 if (bestTimeEl) bestTimeEl.textContent = '--:--.-';
                 if (holderEl) holderEl.style.display = 'none';
-                if (bestTimeMobileEl) bestTimeMobileEl.textContent = '--:--.-';
-                if (recordHolderMobileEl) recordHolderMobileEl.textContent = '';
+                if (mhBest) mhBest.textContent = '--:--.-';
+                if (mhCrown) mhCrown.textContent = '';
             }
         }
     }
@@ -685,7 +675,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const scoreEl = document.getElementById('score');
         const levelEl = document.getElementById('level');
         const linesEl = document.getElementById('lines');
-        // Mobile header elements
         const scoreMobileEl = document.getElementById('scoreMobile');
         const progressBarMobileEl = document.getElementById('progressBarMobile');
 
@@ -694,7 +683,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (linesEl) linesEl.innerText = player.lines;
         if (scoreMobileEl) scoreMobileEl.innerText = player.score;
 
-        // Update progress bars
         const progress = Math.min((player.score / CONFIG.WIN_SCORE) * 100, 100);
         if (progressBarEl) progressBarEl.style.width = `${progress}%`;
         if (progressBarMobileEl) progressBarMobileEl.style.width = `${progress}%`;
@@ -897,9 +885,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!paused && !gameWon && started) playerRotate(1);
     }, false);
 
-    // PAWS button (sidebar version)
-    const btnPawsSidebar = document.getElementById('btn-paws');
-    if (btnPawsSidebar) {
+    // PAWS button (sidebar)
+    const btnPaws = document.getElementById('btn-paws');
+    if (btnPaws) {
         let pawsLastTap = 0;
         const doPause = (e) => {
             e.preventDefault();
@@ -909,8 +897,8 @@ document.addEventListener('DOMContentLoaded', () => {
             pawsLastTap = now;
             if (!gameWon) handlePauseToggle();
         };
-        btnPawsSidebar.addEventListener('touchstart', doPause, { passive: false });
-        btnPawsSidebar.addEventListener('click', doPause);
+        btnPaws.addEventListener('touchstart', doPause, { passive: false });
+        btnPaws.addEventListener('click', doPause);
     }
     
     // Leaderboard buttons

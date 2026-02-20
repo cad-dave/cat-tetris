@@ -51,7 +51,7 @@
         </div>
     </div>
 
-    <!-- Mobile header bar (hidden on desktop) -->
+    <!-- Mobile header bar -->
     <div id="mobile-header">
         <div class="mh-score">
             <div class="mh-score-num" id="scoreMobile">0</div>
@@ -77,16 +77,13 @@
         </button>
 
         <main class="container">
-            <!-- Left sidebar: Next piece + PAWS only on mobile -->
             <aside class="sidebar left">
-                <div class="scorebox">
+                <div class="scorebox next-box">
                     <h3>Next</h3>
                     <canvas id="next" width="120" height="120" aria-label="Next Tetris Piece"></canvas>
                 </div>
-                <div class="scorebox sidebar-paws">
-                    <button id="btn-paws" class="btn-paws-sidebar">🐾<br>PAWS</button>
-                </div>
-                <!-- Desktop only extras -->
+                <button id="btn-paws" class="btn-paws-sidebar">🐾 PAWS</button>
+                <!-- Desktop only: timer and best time -->
                 <div class="scorebox desktop-only">
                     <h3>⏱️ Time</h3>
                     <div class="timer-display" id="timer">0:00.0</div>
