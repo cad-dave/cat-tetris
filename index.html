@@ -51,7 +51,7 @@
         </div>
     </div>
 
-    <!-- Mobile header bar -->
+    <!-- MOBILE HEADER BAR -->
     <div id="mobile-header">
         <div class="mh-score">
             <div class="mh-score-num" id="scoreMobile">0</div>
@@ -61,13 +61,11 @@
         </div>
         <div class="mh-timer">
             <div class="mh-timer-val" id="timerMobile">0:00.0</div>
-            <div class="mh-best">
-                <span id="bestTimeMobile">--:--.-</span>
-                <span class="mh-crown" id="recordHolderMobile"></span>
-            </div>
+            <div class="mh-best" id="bestTimeMobile">--:--.-</div>
+            <div class="mh-crown" id="recordHolderMobile"></div>
         </div>
         <div class="mh-actions">
-            <button class="mh-records-btn" id="viewLeaderboardMobile" aria-label="View Records">🏆</button>
+            <button class="mh-records-btn" id="viewLeaderboardMobile">🏆</button>
         </div>
     </div>
 
@@ -78,12 +76,14 @@
 
         <main class="container">
             <aside class="sidebar left">
+                <!-- Always visible -->
                 <div class="scorebox next-box">
                     <h3>Next</h3>
                     <canvas id="next" width="120" height="120" aria-label="Next Tetris Piece"></canvas>
                 </div>
-                <button id="btn-paws" class="btn-paws-sidebar">🐾 PAWS</button>
-                <!-- Desktop only: timer and best time -->
+                <button id="btn-paws" class="btn-paws-sidebar">🐾<br>PAWS</button>
+
+                <!-- Desktop only -->
                 <div class="scorebox desktop-only">
                     <h3>⏱️ Time</h3>
                     <div class="timer-display" id="timer">0:00.0</div>
@@ -95,6 +95,11 @@
                         <span>👑</span>
                         <span id="recordHolderName">--</span>
                     </div>
+                </div>
+                <div class="scorebox mobile-leaderboard-btn desktop-only">
+                    <button class="btn-leaderboard" id="viewLeaderboardDesktop">
+                        🏆 View Records
+                    </button>
                 </div>
             </aside>
 
