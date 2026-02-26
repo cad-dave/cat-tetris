@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async loadTop10() {
             try {
                 const { getDocs, query, orderBy, limit, collection, db } = window.firebaseLeaderboard;
-                const q = query(collection, orderBy('time_ms', 'asc'), limit(10));
+                const q = query(collection, orderBy('time_ms', 'asc'), limit(100));
                 const snap = await getDocs(q);
                 return snap.docs.map(d => d.data());
             } catch (e) {
