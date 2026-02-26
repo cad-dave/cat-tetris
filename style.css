@@ -673,7 +673,7 @@ body::before {
 }
 
 .action-btn {
-    background: rgba(40, 167, 69, 0.95);
+    background: rgba(40, 167, 69, 0.95)!important;
     min-height: 72px;
 }
 
